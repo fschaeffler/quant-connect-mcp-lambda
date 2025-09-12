@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable max-lines-per-function */
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { QCClient } from '@fschaeffler/quant-connect-client'
-import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types'
-import { ZodObject, ZodRawShape, z } from 'zod'
+import { z, ZodObject } from 'zod'
 import { QCMCPServer } from '../server'
 import { injectCodeSourceId } from '../utils'
 import { getAccountToolsDefinitions } from './account-tools'
@@ -25,7 +27,6 @@ import { getOptimizationToolsDefinitions } from './optimization-tools'
 import { getProjectCollaborationToolsDefinitions } from './project-collaboration-tools'
 import { getProjectNodeToolsDefinitions } from './project-node-tools'
 import { getProjectToolsDefinitions } from './project-tools'
-import { TOOL_KEYS } from './tool-keys'
 
 // Mock dependencies
 jest.mock('@fschaeffler/quant-connect-client')
@@ -47,7 +48,7 @@ jest.mock('./project-node-tools')
 jest.mock('./project-tools')
 
 const MockedQCClient = jest.mocked(QCClient)
-const MockedQCMCPServer = jest.mocked(QCMCPServer)
+jest.mocked(QCMCPServer)
 const mockedInjectCodeSourceId = injectCodeSourceId as jest.MockedFunction<typeof injectCodeSourceId>
 
 // Mock tool definitions
@@ -251,7 +252,7 @@ describe('libs/quant-connect-mcp/src/tools/index', () => {
 
       // Verify that tools from different modules are registered
       const registeredToolNames = mockRegisterTool.mock.calls.map((call: any) => call[0])
-      
+
       expect(registeredToolNames).toContain('ACCOUNT_TOOL_1')
       expect(registeredToolNames).toContain('AI_TOOL_1')
       expect(registeredToolNames).toContain('BACKTEST_TOOL_1')

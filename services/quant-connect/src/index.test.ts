@@ -1,3 +1,7 @@
+/* eslint-disable max-lines-per-function */
+import fs from 'fs'
+import path from 'path'
+
 describe('services/quant-connect/src/index', () => {
   describe('module structure validation', () => {
     it('should be a valid TypeScript module', () => {
@@ -8,8 +12,6 @@ describe('services/quant-connect/src/index', () => {
 
     it('should have proper import statements', () => {
       // Validate that the file has the expected import structure
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const fileContent = fs.readFileSync(filePath, 'utf8')
 
@@ -21,8 +23,6 @@ describe('services/quant-connect/src/index', () => {
     })
 
     it('should export handler', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const fileContent = fs.readFileSync(filePath, 'utf8')
 
@@ -30,8 +30,6 @@ describe('services/quant-connect/src/index', () => {
     })
 
     it('should have proper middleware chain structure', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const fileContent = fs.readFileSync(filePath, 'utf8')
 
@@ -43,8 +41,6 @@ describe('services/quant-connect/src/index', () => {
     })
 
     it('should use QCMCPServer singleton pattern', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const fileContent = fs.readFileSync(filePath, 'utf8')
 
@@ -52,8 +48,6 @@ describe('services/quant-connect/src/index', () => {
     })
 
     it('should have correct middleware order', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const fileContent = fs.readFileSync(filePath, 'utf8')
 
@@ -69,8 +63,6 @@ describe('services/quant-connect/src/index', () => {
 
   describe('code quality and structure', () => {
     it('should be a concise implementation', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const fileContent = fs.readFileSync(filePath, 'utf8')
       const lines = fileContent.split('\n').filter((line: string) => line.trim() !== '')
@@ -81,8 +73,6 @@ describe('services/quant-connect/src/index', () => {
     })
 
     it('should not have any TODO or FIXME comments', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const fileContent = fs.readFileSync(filePath, 'utf8')
 
@@ -92,8 +82,6 @@ describe('services/quant-connect/src/index', () => {
     })
 
     it('should have proper formatting', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const fileContent = fs.readFileSync(filePath, 'utf8')
 
@@ -106,8 +94,6 @@ describe('services/quant-connect/src/index', () => {
 
   describe('dependency usage validation', () => {
     it('should use all imported dependencies', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const fileContent = fs.readFileSync(filePath, 'utf8')
 
@@ -120,8 +106,6 @@ describe('services/quant-connect/src/index', () => {
     })
 
     it('should not have unused imports', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const fileContent = fs.readFileSync(filePath, 'utf8')
 
@@ -136,8 +120,6 @@ describe('services/quant-connect/src/index', () => {
 
   describe('Lambda handler pattern validation', () => {
     it('should follow AWS Lambda handler export pattern', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const fileContent = fs.readFileSync(filePath, 'utf8')
 
@@ -147,8 +129,6 @@ describe('services/quant-connect/src/index', () => {
     })
 
     it('should use middy framework correctly', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const fileContent = fs.readFileSync(filePath, 'utf8')
 
@@ -158,8 +138,6 @@ describe('services/quant-connect/src/index', () => {
     })
 
     it('should configure middleware chain properly', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const fileContent = fs.readFileSync(filePath, 'utf8')
 
@@ -172,20 +150,16 @@ describe('services/quant-connect/src/index', () => {
 
   describe('file integrity', () => {
     it('should exist and be readable', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
 
       expect(fs.existsSync(filePath)).toBe(true)
-      
+
       const stats = fs.statSync(filePath)
       expect(stats.isFile()).toBe(true)
       expect(stats.size).toBeGreaterThan(0)
     })
 
     it('should have reasonable file size', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const stats = fs.statSync(filePath)
 
@@ -195,8 +169,6 @@ describe('services/quant-connect/src/index', () => {
     })
 
     it('should contain only expected content', () => {
-      const fs = require('fs')
-      const path = require('path')
       const filePath = path.join(__dirname, 'index.ts')
       const fileContent = fs.readFileSync(filePath, 'utf8')
 

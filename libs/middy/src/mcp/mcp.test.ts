@@ -1,11 +1,12 @@
+/* eslint-disable max-lines-per-function */
 import type middy from '@middy/core'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import type { JSONRPCMessage } from '@modelcontextprotocol/sdk/types.js'
 import type { Context } from 'aws-lambda'
 import createHttpError from 'http-errors'
-import { middyMCP } from './mcp'
-import { HttpServerTransport } from './http-server-transport'
 import type { RequestEvent, ResponseEvent } from '../types'
+import { HttpServerTransport } from './http-server-transport'
+import { middyMCP } from './mcp'
 
 // Define the extended context type
 type RequestContext = Context & {
@@ -28,14 +29,14 @@ describe('libs/middy/src/mcp/mcp', () => {
     body: string = '{"jsonrpc":"2.0","id":1,"method":"test"}',
     headers: Record<string, string> = {
       'content-type': 'application/json',
-      'accept': 'application/json'
+      accept: 'application/json',
     },
     isBase64Encoded: boolean = false
   ) => ({
     event: {
       body,
       headers,
-      isBase64Encoded
+      isBase64Encoded,
     } as RequestEvent,
     context: {
       callbackWaitsForEmptyEventLoop: false,
@@ -47,20 +48,24 @@ describe('libs/middy/src/mcp/mcp', () => {
       logGroupName: '/aws/lambda/test-function',
       logStreamName: '2023/01/01/[$LATEST]test-stream',
       getRemainingTimeInMillis: () => 30000,
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       done: () => {},
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       fail: () => {},
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       succeed: () => {},
-      jsonRPCMessages: []
+      jsonRPCMessages: [],
     } as RequestContext,
     response: null as ResponseEvent | null,
     error: null,
-    internal: {}
+    internal: {},
   })
 
   beforeEach(() => {
     jest.clearAllMocks()
-    
+
     // Mock console.log to avoid test output noise
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     jest.spyOn(console, 'log').mockImplementation(() => {})
 
     // Setup HttpServerTransport mock
@@ -69,7 +74,7 @@ describe('libs/middy/src/mcp/mcp', () => {
       send: jest.fn(),
       close: jest.fn(),
       handleJSONRPCMessages: jest.fn().mockResolvedValue(undefined),
-      onmessage: undefined
+      onmessage: undefined,
     } as any
 
     MockedHttpServerTransport.mockImplementation(() => mockTransport)
@@ -79,7 +84,7 @@ describe('libs/middy/src/mcp/mcp', () => {
       connect: jest.fn().mockResolvedValue(undefined),
       close: jest.fn(),
       request: jest.fn(),
-      notification: jest.fn()
+      notification: jest.fn(),
     } as any
 
     // Setup http-errors mock
@@ -123,59 +128,44 @@ describe('libs/middy/src/mcp/mcp', () => {
     })
 
     it('should reject missing accept header', async () => {
-      const request = createMockRequest(
-        '{"jsonrpc":"2.0","id":1,"method":"test"}',
-        { 'content-type': 'application/json' }
-      )
+      const request = createMockRequest('{"jsonrpc":"2.0","id":1,"method":"test"}', { 'content-type': 'application/json' })
 
       await expect(middleware.before!(request)).rejects.toThrow()
       expect(mockedCreateHttpError).toHaveBeenCalledWith(406, expect.stringContaining('Not Acceptable'))
     })
 
     it('should reject non-JSON accept header', async () => {
-      const request = createMockRequest(
-        '{"jsonrpc":"2.0","id":1,"method":"test"}',
-        { 'content-type': 'application/json', 'accept': 'text/html' }
-      )
+      const request = createMockRequest('{"jsonrpc":"2.0","id":1,"method":"test"}', { 'content-type': 'application/json', accept: 'text/html' })
 
       await expect(middleware.before!(request)).rejects.toThrow()
       expect(mockedCreateHttpError).toHaveBeenCalledWith(406, expect.stringContaining('Not Acceptable'))
     })
 
     it('should reject missing content-type header', async () => {
-      const request = createMockRequest(
-        '{"jsonrpc":"2.0","id":1,"method":"test"}',
-        { 'accept': 'application/json' }
-      )
+      const request = createMockRequest('{"jsonrpc":"2.0","id":1,"method":"test"}', { accept: 'application/json' })
 
       await expect(middleware.before!(request)).rejects.toThrow()
       expect(mockedCreateHttpError).toHaveBeenCalledWith(415, expect.stringContaining('Unsupported Media Type'))
     })
 
     it('should reject non-JSON content-type header', async () => {
-      const request = createMockRequest(
-        '{"jsonrpc":"2.0","id":1,"method":"test"}',
-        { 'content-type': 'text/plain', 'accept': 'application/json' }
-      )
+      const request = createMockRequest('{"jsonrpc":"2.0","id":1,"method":"test"}', { 'content-type': 'text/plain', accept: 'application/json' })
 
       await expect(middleware.before!(request)).rejects.toThrow()
       expect(mockedCreateHttpError).toHaveBeenCalledWith(415, expect.stringContaining('Unsupported Media Type'))
     })
 
     it('should accept case-insensitive headers', async () => {
-      const request = createMockRequest(
-        '{"jsonrpc":"2.0","id":1,"method":"test"}',
-        { 'Content-Type': 'application/json', 'Accept': 'application/json' }
-      )
+      const request = createMockRequest('{"jsonrpc":"2.0","id":1,"method":"test"}', { 'Content-Type': 'application/json', Accept: 'application/json' })
 
       await expect(middleware.before!(request)).resolves.toBeUndefined()
     })
 
     it('should accept content-type with charset', async () => {
-      const request = createMockRequest(
-        '{"jsonrpc":"2.0","id":1,"method":"test"}',
-        { 'content-type': 'application/json; charset=utf-8', 'accept': 'application/json' }
-      )
+      const request = createMockRequest('{"jsonrpc":"2.0","id":1,"method":"test"}', {
+        'content-type': 'application/json; charset=utf-8',
+        accept: 'application/json',
+      })
 
       await expect(middleware.before!(request)).resolves.toBeUndefined()
     })
@@ -184,51 +174,51 @@ describe('libs/middy/src/mcp/mcp', () => {
   describe('before hook - JSON parsing', () => {
     it('should parse valid JSON-RPC message', async () => {
       const request = createMockRequest('{"jsonrpc":"2.0","id":1,"method":"test","params":{}}')
-      
+
       await middleware.before!(request)
-      
+
       expect(request.context.jsonRPCMessages).toHaveLength(1)
       expect(request.context.jsonRPCMessages[0]).toMatchObject({
         jsonrpc: '2.0',
         id: 1,
-        method: 'test'
+        method: 'test',
       })
     })
 
     it('should parse array of JSON-RPC messages', async () => {
       const messagesArray = [
         { jsonrpc: '2.0', id: 1, method: 'test1' },
-        { jsonrpc: '2.0', id: 2, method: 'test2' }
+        { jsonrpc: '2.0', id: 2, method: 'test2' },
       ]
-      
+
       const request = createMockRequest(JSON.stringify(messagesArray))
-      
+
       await middleware.before!(request)
-      
+
       expect(request.context.jsonRPCMessages).toHaveLength(2)
     })
 
     it('should handle base64 encoded body', async () => {
       const jsonMessage = '{"jsonrpc":"2.0","id":1,"method":"test"}'
       const base64Body = Buffer.from(jsonMessage).toString('base64')
-      
+
       const request = createMockRequest(base64Body, undefined, true)
-      
+
       await middleware.before!(request)
-      
+
       expect(request.context.jsonRPCMessages).toHaveLength(1)
     })
 
     it('should reject invalid JSON', async () => {
       const request = createMockRequest('invalid json {')
-      
+
       await expect(middleware.before!(request)).rejects.toThrow()
       expect(mockedCreateHttpError).toHaveBeenCalledWith(422, expect.stringContaining('Unprocessable Entity'))
     })
 
     it('should reject empty body', async () => {
       const request = createMockRequest('')
-      
+
       await expect(middleware.before!(request)).rejects.toThrow()
       expect(mockedCreateHttpError).toHaveBeenCalledWith(422, expect.stringContaining('Unprocessable Entity'))
     })
@@ -236,7 +226,7 @@ describe('libs/middy/src/mcp/mcp', () => {
     it('should reject invalid JSON-RPC schema', async () => {
       const invalidMessage = { id: 1, method: 'test' } // Missing jsonrpc
       const request = createMockRequest(JSON.stringify(invalidMessage))
-      
+
       await expect(middleware.before!(request)).rejects.toThrow()
       expect(mockedCreateHttpError).toHaveBeenCalledWith(422, expect.stringContaining('Unprocessable Entity'))
     })
@@ -253,7 +243,7 @@ describe('libs/middy/src/mcp/mcp', () => {
       expect(request.response).toEqual({
         headers: { 'Content-Type': 'text/plain' },
         statusCode: 202,
-        body: ''
+        body: '',
       })
     })
 
@@ -267,7 +257,7 @@ describe('libs/middy/src/mcp/mcp', () => {
       expect(request.response).toEqual({
         headers: { 'Content-Type': 'text/plain' },
         statusCode: 202,
-        body: ''
+        body: '',
       })
     })
 
@@ -292,7 +282,7 @@ describe('libs/middy/src/mcp/mcp', () => {
       request.response = {
         statusCode: 200,
         body: '',
-        headers: { 'X-Custom': 'value' }
+        headers: { 'X-Custom': 'value' },
       }
 
       const mockResponse = { jsonrpc: '2.0' as const, id: 1, result: {} }
@@ -302,7 +292,7 @@ describe('libs/middy/src/mcp/mcp', () => {
 
       expect(request.response.headers).toEqual({
         'Content-Type': 'application/json',
-        'X-Custom': 'value'
+        'X-Custom': 'value',
       })
     })
 
@@ -373,7 +363,7 @@ describe('libs/middy/src/mcp/mcp', () => {
       expect(consoleSpy).toHaveBeenCalledWith('MCP request received', {
         headers: request.event.headers,
         body: request.event.body,
-        isBase64Encoded: request.event.isBase64Encoded
+        isBase64Encoded: request.event.isBase64Encoded,
       })
     })
   })
@@ -381,30 +371,30 @@ describe('libs/middy/src/mcp/mcp', () => {
   describe('edge cases', () => {
     it('should handle empty headers object', async () => {
       const request = createMockRequest('{"jsonrpc":"2.0","id":1,"method":"test"}', {})
-      
+
       await expect(middleware.before!(request)).rejects.toThrow()
     })
 
     it('should handle missing headers properly', async () => {
       // Focus on testing the actual behavior rather than edge cases
       const request = createMockRequest('{"jsonrpc":"2.0","id":1,"method":"test"}', {})
-      
+
       await expect(middleware.before!(request)).rejects.toThrow()
       expect(mockedCreateHttpError).toHaveBeenCalled()
     })
 
     it('should convert single message to array', async () => {
       const request = createMockRequest('{"jsonrpc":"2.0","id":1,"method":"test"}')
-      
+
       await middleware.before!(request)
-      
+
       expect(Array.isArray(request.context.jsonRPCMessages)).toBe(true)
       expect(request.context.jsonRPCMessages).toHaveLength(1)
     })
 
     it('should handle null body', async () => {
       const request = createMockRequest(null as any)
-      
+
       await expect(middleware.before!(request)).rejects.toThrow()
       expect(mockedCreateHttpError).toHaveBeenCalledWith(422, expect.stringContaining('Unprocessable Entity'))
     })

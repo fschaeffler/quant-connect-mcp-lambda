@@ -1,6 +1,7 @@
+/* eslint-disable max-lines-per-function */
 import { z, ZodString } from 'zod'
-import { injectCodeSourceId } from './zod-inject-code-source-id'
 import { MCP_SERVER_IDENTIFIER } from '../configs'
+import { injectCodeSourceId } from './zod-inject-code-source-id'
 
 describe('libs/quant-connect-mcp/src/utils/zod-inject-code-source-id', () => {
   describe('injectCodeSourceId', () => {
@@ -55,12 +56,12 @@ describe('libs/quant-connect-mcp/src/utils/zod-inject-code-source-id', () => {
 
       // Verify initial state
       expect(schema.codeSourceId).toBeInstanceOf(ZodString)
-      
+
       injectCodeSourceId(schema)
 
       // Should now be a ZodDefault with the correct default value
       expect(schema.codeSourceId._def.typeName).toBe('ZodDefault')
-      
+
       // Test the default value by parsing an empty object
       const zodObject = z.object({ codeSourceId: schema.codeSourceId })
       const result = zodObject.parse({})
@@ -79,7 +80,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-inject-code-source-id', () => {
 
       // ZodDefault is not instanceof ZodString, so it won't be modified
       expect(schema.codeSourceId).toBe(originalCodeSourceId)
-      
+
       const zodObject = z.object({ codeSourceId: schema.codeSourceId })
       const result = zodObject.parse({})
       expect(result.codeSourceId).toBe('existing-default')
@@ -98,14 +99,14 @@ describe('libs/quant-connect-mcp/src/utils/zod-inject-code-source-id', () => {
 
       // ZodOptional wrapping ZodNullable wrapping ZodString is not instanceof ZodString
       expect(schema.codeSourceId).toBe(originalCodeSourceId)
-      
+
       // Should remain optional/nullable without default
       const zodObject = z.object(schema)
-      const result = zodObject.parse({ 
+      const result = zodObject.parse({
         projectId: 123,
-        name: 'test.py' 
+        name: 'test.py',
       })
-      
+
       expect(result.codeSourceId).toBeUndefined()
     })
 
@@ -126,7 +127,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-inject-code-source-id', () => {
       const zodObject = z.object({ codeSourceId: schema.codeSourceId })
       const result = zodObject.parse({})
       expect(result.codeSourceId).toBe(MCP_SERVER_IDENTIFIER)
-      
+
       // Other fields should remain unchanged
       expect(schema.metadata._def.typeName).toBe('ZodObject')
       expect(schema.optional._def.typeName).toBe('ZodOptional')
@@ -143,7 +144,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-inject-code-source-id', () => {
       injectCodeSourceId(schema)
       const zodObject1 = z.object({ codeSourceId: schema.codeSourceId })
       const result1 = zodObject1.parse({})
-      
+
       injectCodeSourceId(schema)
       const zodObject2 = z.object({ codeSourceId: schema.codeSourceId })
       const result2 = zodObject2.parse({})
@@ -203,7 +204,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-inject-code-source-id', () => {
         codeSourceId: z.string(),
         name: z.string(),
       }
-      
+
       // Create a circular reference
       schema.self = schema
 
@@ -237,7 +238,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-inject-code-source-id', () => {
       const zodObject = z.object(createFileBodyShape)
       const result = zodObject.parse({
         projectId: 123,
-        name: 'main.py'
+        name: 'main.py',
       })
 
       expect(result.codeSourceId).toBeUndefined() // No default was injected
@@ -274,9 +275,9 @@ describe('libs/quant-connect-mcp/src/utils/zod-inject-code-source-id', () => {
             projectId: z.number(),
             codeSourceId: z.string().optional().nullable(), // Not a base ZodString
             name: z.string(),
-          }
+          },
         },
-        injectCodeSourceId: true
+        injectCodeSourceId: true,
       }
 
       const originalSchema = toolDefinition.config.inputSchema.codeSourceId
@@ -289,7 +290,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-inject-code-source-id', () => {
       const zodObject = z.object(toolDefinition.config.inputSchema)
       const result = zodObject.parse({
         projectId: 456,
-        name: 'algorithm.py'
+        name: 'algorithm.py',
       })
 
       expect(result.codeSourceId).toBeUndefined() // No default injected
@@ -324,7 +325,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-inject-code-source-id', () => {
         z.string().optional().nullable(),
       ]
 
-      variations.forEach((zodString, index) => {
+      variations.forEach((zodString) => {
         const schema = {
           codeSourceId: zodString,
           testField: z.number(),

@@ -8,15 +8,9 @@ const config: Config = {
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },
-  transformIgnorePatterns: [
-    'node_modules/(?!(@middy|@modelcontextprotocol|@fschaeffler)/.*)'
-  ],
+  transformIgnorePatterns: ['node_modules/(?!(@middy|@modelcontextprotocol|@fschaeffler)/.*)'],
   coverageDirectory: 'coverage',
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-    '!src/**/*.test.ts',
-  ],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts', '!src/**/*.test.ts'],
   coverageReporters: ['text', 'lcov', 'html'],
   moduleFileExtensions: ['ts', 'js', 'json'],
 }

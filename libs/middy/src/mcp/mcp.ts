@@ -96,9 +96,10 @@ export const middyMCP = ({ server }: MCPMiddlewareOptions): middy.MiddlewareObj<
           ...request.response,
           headers: getHeadersWithDefaults(request.response?.headers),
           statusCode: 200,
-          body: Array.isArray(responseMessages) && responseMessages.length === 0 
-            ? '' // Empty response for notifications
-            : JSON.stringify(responseMessages),
+          body:
+            Array.isArray(responseMessages) && responseMessages.length === 0
+              ? '' // Empty response for notifications
+              : JSON.stringify(responseMessages),
         }
       }
     },

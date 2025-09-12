@@ -1,4 +1,5 @@
-import { z, ZodObject, ZodOptional, ZodDefault, ZodUnion } from 'zod'
+/* eslint-disable max-lines-per-function */
+import { z } from 'zod'
 import { mergeObjectsToRawShape, mergeUnionToRawShape } from './zod-objects-merge'
 
 describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
@@ -51,7 +52,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       const result = mergeObjectsToRawShape([obj1, obj2])
 
       expect(Object.keys(result).sort()).toEqual(['email', 'id', 'name'])
-      
+
       // id should be a union of string and number
       expect(result.id._def.typeName).toBe('ZodUnion')
       // name and email are only in one object each, so should be optional
@@ -74,7 +75,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
 
       // required should be a union even though both are strings (algorithm always unions)
       expect(result.required._def.typeName).toBe('ZodUnion')
-      
+
       // optional should become optional (not required in all objects)
       expect(result.optional._def.typeName).toBe('ZodOptional')
     })
@@ -94,7 +95,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
 
       // count should become optional since it's not in obj2
       expect(result.count._def.typeName).toBe('ZodOptional')
-      
+
       // name should be a union even though both are strings (algorithm always unions)
       expect(result.name._def.typeName).toBe('ZodUnion')
     })
@@ -134,10 +135,10 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       const result = mergeObjectsToRawShape([obj1, obj2])
 
       expect(Object.keys(result).sort()).toEqual(['metadata', 'tags', 'user'])
-      
+
       // user should be a union of the two object types
       expect(result.user._def.typeName).toBe('ZodUnion')
-      
+
       // tags and metadata should be optional (not present in both)
       expect(result.tags._def.typeName).toBe('ZodOptional')
       expect(result.metadata._def.typeName).toBe('ZodOptional')
@@ -151,7 +152,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       const result = mergeObjectsToRawShape([obj1, obj2, obj3])
 
       expect(Object.keys(result).sort()).toEqual(['a', 'b', 'c'])
-      
+
       // All should be optional since none appear in all objects
       expect(result.a._def.typeName).toBe('ZodOptional')
       expect(result.b._def.typeName).toBe('ZodOptional')
@@ -167,7 +168,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       const result = mergeObjectsToRawShape([schema, schema, schema])
 
       expect(Object.keys(result)).toEqual(['name', 'age'])
-      
+
       // Should be unions even for identical schemas (algorithm always unions multiple inputs)
       expect(result.name._def.typeName).toBe('ZodUnion')
       expect(result.age._def.typeName).toBe('ZodUnion')
@@ -192,13 +193,13 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       const result = mergeUnionToRawShape(union)
 
       expect(Object.keys(result).sort()).toEqual(['age', 'name', 'permissions', 'type'])
-      
+
       // name should be a union even though both are strings
       expect(result.name._def.typeName).toBe('ZodUnion')
-      
+
       // type should be a union of literals
       expect(result.type._def.typeName).toBe('ZodUnion')
-      
+
       // age and permissions should be optional (not in both)
       expect(result.age._def.typeName).toBe('ZodOptional')
       expect(result.permissions._def.typeName).toBe('ZodOptional')
@@ -242,10 +243,10 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       const result = mergeUnionToRawShape(union)
 
       expect(Object.keys(result).sort()).toEqual(['active', 'name', 'value'])
-      
+
       // name should be a union even though both are strings
       expect(result.name._def.typeName).toBe('ZodUnion')
-      
+
       // value and active should be optional
       expect(result.value._def.typeName).toBe('ZodOptional')
       expect(result.active._def.typeName).toBe('ZodOptional')
@@ -272,10 +273,10 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       const result = mergeUnionToRawShape(union)
 
       expect(Object.keys(result).sort()).toEqual(['action', 'data'])
-      
+
       // action should be union of literals
       expect(result.action._def.typeName).toBe('ZodUnion')
-      
+
       // data should be union of objects
       expect(result.data._def.typeName).toBe('ZodUnion')
     })
@@ -285,7 +286,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       const mockUnion = {
         _def: {
           // Missing options property
-        }
+        },
       } as any
 
       expect(() => {
@@ -304,8 +305,8 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
     it('should handle union with undefined options', () => {
       const mockUnion = {
         _def: {
-          options: undefined
-        }
+          options: undefined,
+        },
       } as any
 
       expect(() => {
@@ -331,7 +332,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
 
         // optional should become optional since it's optional in obj1
         expect(result.optional._def.typeName).toBe('ZodOptional')
-        
+
         // required should be a union (algorithm always unions)
         expect(result.required._def.typeName).toBe('ZodUnion')
       })
@@ -351,7 +352,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
 
         // withDefault should become optional (has default in obj1)
         expect(result.withDefault._def.typeName).toBe('ZodOptional')
-        
+
         // normal should be a union (algorithm always unions)
         expect(result.normal._def.typeName).toBe('ZodUnion')
       })
@@ -388,7 +389,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
 
         // Both optional in both objects = optional result
         expect(result.maybeOptional._def.typeName).toBe('ZodOptional')
-        
+
         // Required in both = union result (algorithm always unions)
         expect(result.definitelyRequired._def.typeName).toBe('ZodUnion')
       })
@@ -430,15 +431,15 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       const result = mergeObjectsToRawShape([createFileRequest, updateFileRequest])
 
       expect(Object.keys(result).sort()).toEqual(['codeSourceId', 'content', 'name', 'newContent', 'projectId'])
-      
+
       // Common required fields should be unions
       expect(result.projectId._def.typeName).toBe('ZodUnion')
       expect(result.name._def.typeName).toBe('ZodUnion')
-      
+
       // Fields not in both should be optional
       expect(result.content._def.typeName).toBe('ZodOptional')
       expect(result.newContent._def.typeName).toBe('ZodOptional')
-      
+
       // codeSourceId should be a union (algorithm always creates unions)
       expect(result.codeSourceId._def.typeName).toBe('ZodUnion')
     })
@@ -463,12 +464,12 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       const result = mergeUnionToRawShape(updateFileBodyUnion)
 
       expect(Object.keys(result).sort()).toEqual(['codeSourceId', 'content', 'name', 'newName', 'projectId'])
-      
+
       // Common fields should be unions
       expect(result.projectId._def.typeName).toBe('ZodUnion')
       expect(result.name._def.typeName).toBe('ZodUnion')
       expect(result.codeSourceId._def.typeName).toBe('ZodUnion')
-      
+
       // Unique fields should be optional
       expect(result.content._def.typeName).toBe('ZodOptional')
       expect(result.newName._def.typeName).toBe('ZodOptional')
@@ -521,10 +522,10 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       const result = mergeObjectsToRawShape([smallObj, largeObj])
 
       expect(Object.keys(result)).toHaveLength(5)
-      
+
       // id should be a union (algorithm always unions)
       expect(result.id._def.typeName).toBe('ZodUnion')
-      
+
       // Others should be optional (only in largeObj)
       expect(result.name._def.typeName).toBe('ZodOptional')
       expect(result.email._def.typeName).toBe('ZodOptional')
@@ -549,7 +550,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
 
       // Should create a three-way union
       expect(result.value._def.typeName).toBe('ZodUnion')
-      
+
       // Test that the union works
       const schema = z.object(result)
       expect(() => schema.parse({ value: 'string' })).not.toThrow()
@@ -561,8 +562,8 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       // Test with union that has null options
       const mockUnion = {
         _def: {
-          options: null
-        }
+          options: null,
+        },
       } as any
 
       expect(() => {
@@ -573,8 +574,8 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
     it('should handle union with empty options array', () => {
       const mockUnion = {
         _def: {
-          options: []
-        }
+          options: [],
+        },
       } as any
 
       const result = mergeUnionToRawShape(mockUnion)
@@ -586,14 +587,8 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       const obj = z.object({ name: z.string() })
       const mockUnion = {
         _def: {
-          options: [
-            obj,
-            z.string(),
-            z.number(),
-            z.object({ age: z.number() }),
-            z.boolean()
-          ]
-        }
+          options: [obj, z.string(), z.number(), z.object({ age: z.number() }), z.boolean()],
+        },
       } as any
 
       const result = mergeUnionToRawShape(mockUnion)
@@ -607,7 +602,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
 
   describe('performance and memory', () => {
     it('should handle large numbers of objects efficiently', () => {
-      const objects = Array.from({ length: 50 }, (_, i) => 
+      const objects = Array.from({ length: 50 }, (_, i) =>
         z.object({
           [`field${i}`]: z.string(),
           common: z.number(),
@@ -620,10 +615,10 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
 
       // Should complete reasonably quickly (< 100ms for 50 objects)
       expect(duration).toBeLessThan(100)
-      
+
       // Should have all fields
       expect(Object.keys(result)).toHaveLength(51) // 50 unique fields + 1 common
-      
+
       // Common field should be a union (algorithm always unions)
       expect(result.common._def.typeName).toBe('ZodUnion')
     })
@@ -638,9 +633,9 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       const result = mergeObjectsToRawShape([obj])
 
       expect(Object.keys(result)).toHaveLength(100)
-      
+
       // All should remain as original types
-      Object.values(result).forEach(field => {
+      Object.values(result).forEach((field) => {
         expect(field._def.typeName).toBe('ZodString')
       })
     })
@@ -650,7 +645,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
     it('should preserve original type references when possible', () => {
       const stringType = z.string()
       const numberType = z.number()
-      
+
       const obj = z.object({
         str: stringType,
         num: numberType,
@@ -678,7 +673,7 @@ describe('libs/quant-connect-mcp/src/utils/zod-objects-merge', () => {
       // Should accept both string and number
       expect(() => schema.parse({ flexible: 'test' })).not.toThrow()
       expect(() => schema.parse({ flexible: 42 })).not.toThrow()
-      
+
       // Should reject other types
       expect(() => schema.parse({ flexible: true })).toThrow()
     })

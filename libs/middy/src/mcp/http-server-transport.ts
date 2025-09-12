@@ -49,7 +49,7 @@ export class HttpServerTransport implements Transport {
     jsonRPCMessages.map((message) => {
       this.onmessage?.(message)
     })
-    
+
     const requestMessages = jsonRPCMessages.filter(isRequestMessage)
     const notificationMessages = jsonRPCMessages.filter(isNotificationMessage)
 

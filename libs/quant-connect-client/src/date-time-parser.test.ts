@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { fixDateStrings } from './date-time-parser'
 
 describe('fixDateStrings', () => {
@@ -26,11 +27,11 @@ describe('fixDateStrings', () => {
     })
 
     it('should not transform non-string values', () => {
-      const input = { 
+      const input = {
         number: 123,
         boolean: true,
         nullValue: null,
-        undefinedValue: undefined
+        undefinedValue: undefined,
       }
       expect(fixDateStrings(input)).toEqual(input)
     })
@@ -43,18 +44,18 @@ describe('fixDateStrings', () => {
           date: '2023-10-05 14:30:00',
           level2: {
             anotherDate: '2023-12-25 23:59:59.999',
-            nonDate: 'text'
-          }
-        }
+            nonDate: 'text',
+          },
+        },
       }
       const expected = {
         level1: {
           date: '2023-10-05T14:30:00Z',
           level2: {
             anotherDate: '2023-12-25T23:59:59.999Z',
-            nonDate: 'text'
-          }
-        }
+            nonDate: 'text',
+          },
+        },
       }
       expect(fixDateStrings(input)).toEqual(expected)
     })
@@ -65,22 +66,22 @@ describe('fixDateStrings', () => {
           b: {
             c: {
               d: {
-                date: '2023-01-01 00:00:00'
-              }
-            }
-          }
-        }
+                date: '2023-01-01 00:00:00',
+              },
+            },
+          },
+        },
       }
       const expected = {
         a: {
           b: {
             c: {
               d: {
-                date: '2023-01-01T00:00:00Z'
-              }
-            }
-          }
-        }
+                date: '2023-01-01T00:00:00Z',
+              },
+            },
+          },
+        },
       }
       expect(fixDateStrings(input)).toEqual(expected)
     })
@@ -89,10 +90,10 @@ describe('fixDateStrings', () => {
   describe('array transformations', () => {
     it('should transform date strings in arrays', () => {
       const input = {
-        dates: ['2023-10-05 14:30:00', 'not a date', '2023-12-25 15:45:30.456']
+        dates: ['2023-10-05 14:30:00', 'not a date', '2023-12-25 15:45:30.456'],
       }
       const expected = {
-        dates: ['2023-10-05T14:30:00Z', 'not a date', '2023-12-25T15:45:30.456Z']
+        dates: ['2023-10-05T14:30:00Z', 'not a date', '2023-12-25T15:45:30.456Z'],
       }
       expect(fixDateStrings(input)).toEqual(expected)
     })
@@ -102,15 +103,15 @@ describe('fixDateStrings', () => {
         items: [
           { id: 1, createdAt: '2023-10-05 14:30:00' },
           { id: 2, createdAt: '2023-10-06 15:45:30.123' },
-          { id: 3, name: 'test' }
-        ]
+          { id: 3, name: 'test' },
+        ],
       }
       const expected = {
         items: [
           { id: 1, createdAt: '2023-10-05T14:30:00Z' },
           { id: 2, createdAt: '2023-10-06T15:45:30.123Z' },
-          { id: 3, name: 'test' }
-        ]
+          { id: 3, name: 'test' },
+        ],
       }
       expect(fixDateStrings(input)).toEqual(expected)
     })
@@ -119,14 +120,14 @@ describe('fixDateStrings', () => {
       const input = {
         matrix: [
           ['2023-01-01 12:00:00', 'text'],
-          ['2023-02-01 13:00:00.500', 'another text']
-        ]
+          ['2023-02-01 13:00:00.500', 'another text'],
+        ],
       }
       const expected = {
         matrix: [
           ['2023-01-01T12:00:00Z', 'text'],
-          ['2023-02-01T13:00:00.500Z', 'another text']
-        ]
+          ['2023-02-01T13:00:00.500Z', 'another text'],
+        ],
       }
       expect(fixDateStrings(input)).toEqual(expected)
     })
@@ -155,7 +156,7 @@ describe('fixDateStrings', () => {
       const input = { date: '2023-10-05 14:30:00' }
       const inputCopy = JSON.parse(JSON.stringify(input))
       const result = fixDateStrings(input)
-      
+
       expect(input).toEqual(inputCopy)
       expect(result).not.toBe(input)
     })
@@ -169,7 +170,7 @@ describe('fixDateStrings', () => {
       { input: '2023-10-05 14:30:00.123456', shouldTransform: true, description: 'with microseconds' },
       { input: '2023-10-05 14:30:00Z', shouldTransform: true, description: 'with Z suffix' },
       { input: '2023-10-05 14:30:00.123Z', shouldTransform: true, description: 'with milliseconds and Z' },
-      
+
       // Invalid formats (won't match regex)
       { input: '2023-10-05T14:30:00', shouldTransform: false, description: 'ISO format with T' },
       { input: '2023-10-05', shouldTransform: false, description: 'date only' },
@@ -180,20 +181,20 @@ describe('fixDateStrings', () => {
       { input: '2023-10-05  14:30:00', shouldTransform: false, description: 'double space' },
       { input: '', shouldTransform: false, description: 'empty string' },
       { input: 'not a date at all', shouldTransform: false, description: 'random text' },
-      
+
       // Invalid date values but valid format (will transform - this is by design)
       { input: '2023-13-05 14:30:00', shouldTransform: true, description: 'invalid month (format valid)' },
       { input: '2023-10-32 14:30:00', shouldTransform: true, description: 'invalid day (format valid)' },
       { input: '2023-10-05 25:30:00', shouldTransform: true, description: 'invalid hour (format valid)' },
       { input: '2023-10-05 14:60:00', shouldTransform: true, description: 'invalid minute (format valid)' },
-      { input: '2023-10-05 14:30:60', shouldTransform: true, description: 'invalid second (format valid)' }
+      { input: '2023-10-05 14:30:60', shouldTransform: true, description: 'invalid second (format valid)' },
     ]
 
     testCases.forEach(({ input, shouldTransform, description }) => {
       it(`should ${shouldTransform ? 'transform' : 'not transform'} ${description}: "${input}"`, () => {
         const obj = { testValue: input }
         const result = fixDateStrings(obj)
-        
+
         if (shouldTransform) {
           expect(result.testValue).not.toBe(input)
           expect(result.testValue).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/)
@@ -216,28 +217,28 @@ describe('fixDateStrings', () => {
           results: {
             statistics: {
               startDate: '2023-01-01 00:00:00',
-              endDate: '2023-12-31 23:59:59.999Z'
+              endDate: '2023-12-31 23:59:59.999Z',
             },
             trades: [
               {
                 symbol: 'SPY',
                 entryTime: '2023-03-15 09:30:00',
                 exitTime: '2023-03-15 16:00:00.500',
-                profit: 125.50
+                profit: 125.5,
               },
               {
                 symbol: 'AAPL',
                 entryTime: '2023-03-16 10:15:30',
                 exitTime: null,
-                profit: -50.25
-              }
-            ]
+                profit: -50.25,
+              },
+            ],
           },
           logs: [
             { timestamp: '2023-10-05 14:30:01', message: 'Backtest started' },
-            { timestamp: '2023-10-05 16:45:29', message: 'Backtest completed' }
-          ]
-        }
+            { timestamp: '2023-10-05 16:45:29', message: 'Backtest completed' },
+          ],
+        },
       }
 
       const result = fixDateStrings(input)
@@ -258,7 +259,7 @@ describe('fixDateStrings', () => {
       expect(result.backtest.name).toBe('Test Strategy')
       expect(result.backtest.status).toBe('completed')
       expect(result.backtest.results.trades[0].symbol).toBe('SPY')
-      expect(result.backtest.results.trades[0].profit).toBe(125.50)
+      expect(result.backtest.results.trades[0].profit).toBe(125.5)
       expect(result.backtest.results.trades[1].exitTime).toBe(null)
       expect(result.backtest.logs[0].message).toBe('Backtest started')
     })

@@ -1,5 +1,6 @@
-import { HttpServerTransport } from './http-server-transport'
+/* eslint-disable max-lines-per-function */
 import type { JSONRPCMessage } from '@modelcontextprotocol/sdk/types.js'
+import { HttpServerTransport } from './http-server-transport'
 
 describe('libs/middy/src/mcp/http-server-transport', () => {
   let transport: HttpServerTransport
@@ -29,13 +30,13 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
 
     it('should throw error when already started', async () => {
       await transport.start()
-      
+
       await expect(transport.start()).rejects.toThrow('HttpServerTransport already started')
     })
 
     it('should set internal started state', async () => {
       await transport.start()
-      
+
       // Verify by trying to start again
       await expect(transport.start()).rejects.toThrow('HttpServerTransport already started')
     })
@@ -65,7 +66,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
       const responseMessage: JSONRPCMessage = {
         jsonrpc: '2.0',
         id: 1,
-        result: { success: true }
+        result: { success: true },
       }
 
       await expect(transport.send(responseMessage)).resolves.toBeUndefined()
@@ -76,7 +77,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
         jsonrpc: '2.0',
         id: 1,
         method: 'test',
-        params: {}
+        params: {},
       }
 
       await expect(transport.send(requestMessage)).resolves.toBeUndefined()
@@ -86,7 +87,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
       const notificationMessage: JSONRPCMessage = {
         jsonrpc: '2.0',
         method: 'notification',
-        params: {}
+        params: {},
       }
 
       await expect(transport.send(notificationMessage)).resolves.toBeUndefined()
@@ -96,7 +97,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
       const responseMessage: JSONRPCMessage = {
         jsonrpc: '2.0',
         id: 999,
-        result: { success: true }
+        result: { success: true },
       }
 
       // Should not throw even if no pending request exists
@@ -108,7 +109,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
     it('should allow setting onmessage handler', () => {
       const handler = jest.fn()
       transport.onmessage = handler
-      
+
       expect(transport.onmessage).toBe(handler)
     })
 
@@ -121,25 +122,25 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
           jsonrpc: '2.0',
           id: 1,
           method: 'test',
-          params: {}
-        }
+          params: {},
+        },
       ]
 
       // Start handling but don't await (it will hang waiting for response)
       const promise = transport.handleJSONRPCMessages(messages)
-      
+
       // Give a moment for the handler to be called
-      await new Promise(resolve => setTimeout(resolve, 10))
-      
+      await new Promise((resolve) => setTimeout(resolve, 10))
+
       expect(handler).toHaveBeenCalledWith(messages[0])
-      
+
       // Send response to complete the promise
       await transport.send({
         jsonrpc: '2.0',
         id: 1,
-        result: { success: true }
+        result: { success: true },
       })
-      
+
       await promise
     })
 
@@ -150,8 +151,8 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
         {
           jsonrpc: '2.0',
           method: 'notification',
-          params: {}
-        }
+          params: {},
+        },
       ]
 
       await expect(transport.handleJSONRPCMessages(messages)).resolves.toEqual([])
@@ -170,13 +171,13 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
           {
             jsonrpc: '2.0',
             method: 'notification',
-            params: {}
+            params: {},
           },
           {
             jsonrpc: '2.0',
             id: 1,
-            result: { success: true }
-          }
+            result: { success: true },
+          },
         ]
 
         const result = await transport.handleJSONRPCMessages(messages)
@@ -191,17 +192,17 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
           {
             jsonrpc: '2.0',
             method: 'notification',
-            params: {}
+            params: {},
           },
           {
             jsonrpc: '2.0',
             id: 1,
-            result: { success: true }
-          }
+            result: { success: true },
+          },
         ]
 
         await transport.handleJSONRPCMessages(messages)
-        
+
         expect(handler).toHaveBeenCalledTimes(2)
         expect(handler).toHaveBeenCalledWith(messages[0])
         expect(handler).toHaveBeenCalledWith(messages[1])
@@ -214,7 +215,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
           jsonrpc: '2.0',
           id: 1,
           method: 'test',
-          params: { value: 'test' }
+          params: { value: 'test' },
         }
 
         // Start handling the request
@@ -224,11 +225,11 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
         const responseMessage: JSONRPCMessage = {
           jsonrpc: '2.0',
           id: 1,
-          result: { success: true }
+          result: { success: true },
         }
 
         await transport.send(responseMessage)
-        
+
         const result = await promise
         expect(result).toEqual(responseMessage)
       })
@@ -238,7 +239,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
           jsonrpc: '2.0',
           id: 1,
           method: 'test',
-          params: {}
+          params: {},
         }
 
         const promise = transport.handleJSONRPCMessages([requestMessage])
@@ -248,12 +249,12 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
           id: 1,
           error: {
             code: -32601,
-            message: 'Method not found'
-          }
+            message: 'Method not found',
+          },
         }
 
         await transport.send(errorResponse)
-        
+
         const result = await promise
         expect(result).toEqual(errorResponse)
       })
@@ -266,14 +267,14 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
             jsonrpc: '2.0',
             id: 1,
             method: 'test1',
-            params: {}
+            params: {},
           },
           {
             jsonrpc: '2.0',
             id: 2,
             method: 'test2',
-            params: {}
-          }
+            params: {},
+          },
         ]
 
         const promise = transport.handleJSONRPCMessages(requestMessages)
@@ -282,22 +283,22 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
         const response2: JSONRPCMessage = {
           jsonrpc: '2.0',
           id: 2,
-          result: { value: 'response2' }
+          result: { value: 'response2' },
         }
 
         const response1: JSONRPCMessage = {
           jsonrpc: '2.0',
           id: 1,
-          result: { value: 'response1' }
+          result: { value: 'response1' },
         }
 
         await transport.send(response2)
         await transport.send(response1)
-        
+
         const result = await promise
         expect(Array.isArray(result)).toBe(true)
         expect(result).toHaveLength(2)
-        
+
         // Results should be in the same order as requests
         const resultArray = result as JSONRPCMessage[]
         expect(resultArray[0]).toEqual(response1)
@@ -309,19 +310,19 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
           {
             jsonrpc: '2.0',
             method: 'notification',
-            params: {}
+            params: {},
           },
           {
             jsonrpc: '2.0',
             id: 1,
             method: 'test',
-            params: {}
+            params: {},
           },
           {
             jsonrpc: '2.0',
             id: 2,
-            result: { existing: 'response' }
-          }
+            result: { existing: 'response' },
+          },
         ]
 
         const promise = transport.handleJSONRPCMessages(messages)
@@ -329,11 +330,11 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
         const response: JSONRPCMessage = {
           jsonrpc: '2.0',
           id: 1,
-          result: { success: true }
+          result: { success: true },
         }
 
         await transport.send(response)
-        
+
         const result = await promise
         expect(result).toEqual(response) // Single response, not array
       })
@@ -346,17 +347,17 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
           jsonrpc: '2.0',
           id: 1,
           method: 'test1',
-          params: {}
+          params: {},
         }
 
-        const firstPromise = transport.handleJSONRPCMessages([firstRequest])
-        
+        transport.handleJSONRPCMessages([firstRequest])
+
         // Second call should clear pending requests from first call
         const secondRequest: JSONRPCMessage = {
           jsonrpc: '2.0',
           id: 2,
           method: 'test2',
-          params: {}
+          params: {},
         }
 
         const secondPromise = transport.handleJSONRPCMessages([secondRequest])
@@ -365,7 +366,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
         await transport.send({
           jsonrpc: '2.0',
           id: 2,
-          result: { success: true }
+          result: { success: true },
         })
 
         // Second promise should resolve
@@ -377,7 +378,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
         await transport.send({
           jsonrpc: '2.0',
           id: 1,
-          result: { success: true }
+          result: { success: true },
         })
 
         // This is mainly to ensure no errors are thrown
@@ -399,8 +400,8 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
             jsonrpc: '2.0',
             method: 'notification',
             // Missing id - won't be treated as request
-            params: {}
-          }
+            params: {},
+          },
         ]
 
         // These messages won't be treated as requests due to missing required fields
@@ -416,36 +417,34 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
             jsonrpc: '2.0',
             id: 1,
             method: 'test1',
-            params: {}
+            params: {},
           },
           {
             jsonrpc: '2.0',
             id: 1, // Duplicate ID
             method: 'test2',
-            params: {}
-          }
+            params: {},
+          },
         ]
 
         // Due to the Map.set behavior, only the second promise will be resolved
         // The first promise will never resolve, causing the Promise.all to hang
         // This is actually a bug in the implementation, but we test the current behavior
-        
+
         // We'll use a timeout to test this scenario
         const promise = transport.handleJSONRPCMessages(requestMessages)
 
         const response: JSONRPCMessage = {
           jsonrpc: '2.0',
           id: 1,
-          result: { success: true }
+          result: { success: true },
         }
 
         await transport.send(response)
-        
+
         // This will timeout because the first promise never resolves
         // We'll use a race condition to test this
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Test timeout - expected behavior')), 100)
-        )
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Test timeout - expected behavior')), 100))
 
         await expect(Promise.race([promise, timeoutPromise])).rejects.toThrow('Test timeout - expected behavior')
       })
@@ -455,30 +454,30 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
           jsonrpc: '2.0',
           id: 1,
           method: 'test1',
-          params: {}
+          params: {},
         }
 
         const request2: JSONRPCMessage = {
           jsonrpc: '2.0',
           id: 2,
           method: 'test2',
-          params: {}
+          params: {},
         }
 
         // Start both calls concurrently
-        const promise1 = transport.handleJSONRPCMessages([request1])
+        transport.handleJSONRPCMessages([request1])
         const promise2 = transport.handleJSONRPCMessages([request2])
 
         // Send responses
         await transport.send({
           jsonrpc: '2.0',
           id: 2,
-          result: { value: 'response2' }
+          result: { value: 'response2' },
         })
 
         // Only the second promise should resolve due to session clearing
         await expect(promise2).resolves.toBeDefined()
-        
+
         // First promise will hang indefinitely, but we can't test that easily
         // Just ensure no errors are thrown
         expect(true).toBe(true)
@@ -496,25 +495,25 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
             jsonrpc: '2.0',
             id: 1,
             method: 'test',
-            params: {}
+            params: {},
           },
           // Invalid request (no method)
           {
             jsonrpc: '2.0',
-            id: 2
+            id: 2,
           } as any,
           // Invalid request (no id)
           {
             jsonrpc: '2.0',
             method: 'test',
-            params: {}
+            params: {},
           },
           // Response message
           {
             jsonrpc: '2.0',
             id: 3,
-            result: {}
-          }
+            result: {},
+          },
         ]
 
         const promise = transport.handleJSONRPCMessages(messages)
@@ -523,7 +522,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
         await transport.send({
           jsonrpc: '2.0',
           id: 1,
-          result: { success: true }
+          result: { success: true },
         })
 
         const result = await promise
@@ -538,7 +537,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
           jsonrpc: '2.0',
           id: 42,
           method: 'calculate',
-          params: { operation: 'add', values: [1, 2, 3] }
+          params: { operation: 'add', values: [1, 2, 3] },
         }
 
         const promise = transport.handleJSONRPCMessages([request])
@@ -546,11 +545,11 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
         const response: JSONRPCMessage = {
           jsonrpc: '2.0',
           id: 42,
-          result: { value: 6 }
+          result: { value: 6 },
         }
 
         await transport.send(response)
-        
+
         const result = await promise
         expect(result).toEqual(response)
       })
@@ -560,7 +559,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
           jsonrpc: '2.0',
           id: 100,
           method: 'test',
-          params: {}
+          params: {},
         }
 
         const promise = transport.handleJSONRPCMessages([request])
@@ -568,7 +567,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
         const response: JSONRPCMessage = {
           jsonrpc: '2.0',
           id: 100,
-          result: { success: true }
+          result: { success: true },
         }
 
         await transport.send(response)
@@ -578,7 +577,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
         await transport.send({
           jsonrpc: '2.0',
           id: 100,
-          result: { duplicate: true }
+          result: { duplicate: true },
         })
 
         // Should not throw or cause any issues
@@ -590,8 +589,8 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
   describe('Transport interface compliance', () => {
     it('should have all required Transport methods', () => {
       const transportMethods = ['start', 'send', 'close']
-      
-      transportMethods.forEach(method => {
+
+      transportMethods.forEach((method) => {
         expect(transport).toHaveProperty(method)
         expect(typeof (transport as any)[method]).toBe('function')
       })
@@ -604,7 +603,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
     it('should work as a proper Transport implementation', async () => {
       // Test the basic Transport workflow
       await transport.start()
-      
+
       const handler = jest.fn()
       transport.onmessage = handler
 
@@ -612,7 +611,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
         jsonrpc: '2.0',
         id: 1,
         method: 'test',
-        params: {}
+        params: {},
       }
 
       const promise = transport.handleJSONRPCMessages([request])
@@ -622,7 +621,7 @@ describe('libs/middy/src/mcp/http-server-transport', () => {
       const response: JSONRPCMessage = {
         jsonrpc: '2.0',
         id: 1,
-        result: { success: true }
+        result: { success: true },
       }
 
       await transport.send(response)

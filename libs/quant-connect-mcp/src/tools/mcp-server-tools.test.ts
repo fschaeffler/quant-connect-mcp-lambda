@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { name, version } from '../../package.json'
 import { getMCPServerToolsDefinitions } from './mcp-server-tools'
 import { MCP_SERVER_TOOL_KEYS } from './tool-keys'
@@ -19,7 +20,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
 
     it('should contain all expected MCP server tools', () => {
       const toolKeys = Object.keys(getMCPServerToolsDefinitions)
-      
+
       expect(toolKeys).toContain(MCP_SERVER_TOOL_KEYS.READ_INFRA_HEALTH)
       expect(toolKeys).toContain(MCP_SERVER_TOOL_KEYS.READ_MCP_SERVER_VERSION)
       expect(toolKeys).toContain(MCP_SERVER_TOOL_KEYS.READ_LATEST_MCP_SERVER_VERSION)
@@ -32,8 +33,8 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
 
     it('should have all custom tools (no QC API tools)', () => {
       const tools = Object.values(getMCPServerToolsDefinitions)
-      const customTools = tools.filter(tool => 'func' in tool)
-      const qcApiTools = tools.filter(tool => 'url' in tool)
+      const customTools = tools.filter((tool) => 'func' in tool)
+      const qcApiTools = tools.filter((tool) => 'url' in tool)
 
       expect(customTools.length).toBe(3)
       expect(qcApiTools.length).toBe(0)
@@ -52,7 +53,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
     it('should have custom output schema with health status', () => {
       expect(healthTool.config.outputSchema).toBeDefined()
       expect(healthTool.config.outputSchema).toHaveProperty('healthStatus')
-      
+
       // Should be a literal 'ok' type
       if (healthTool.config.outputSchema) {
         const healthStatusSchema = healthTool.config.outputSchema.healthStatus
@@ -79,7 +80,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
     it('should execute custom function and return health status', async () => {
       if ('func' in healthTool) {
         const result = await healthTool.func({})
-        
+
         expect(result).toEqual({ healthStatus: 'ok' })
       }
     })
@@ -95,7 +96,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
       if ('func' in healthTool) {
         // Should work with empty object
         await expect(healthTool.func({})).resolves.toEqual({ healthStatus: 'ok' })
-        
+
         // Should work with undefined
         await expect(healthTool.func(undefined as any)).resolves.toEqual({ healthStatus: 'ok' })
       }
@@ -114,7 +115,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
     it('should have custom output schema with version', () => {
       expect(versionTool.config.outputSchema).toBeDefined()
       expect(versionTool.config.outputSchema).toHaveProperty('version')
-      
+
       // Should be a string type with description
       if (versionTool.config.outputSchema) {
         const versionSchema = versionTool.config.outputSchema.version
@@ -141,7 +142,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
     it('should execute custom function and return package version', async () => {
       if ('func' in versionTool) {
         const result = await versionTool.func({})
-        
+
         expect(result).toEqual({ version })
         expect(typeof result.version).toBe('string')
         expect(result.version.length).toBeGreaterThan(0)
@@ -151,7 +152,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
     it('should return the actual package.json version', async () => {
       if ('func' in versionTool) {
         const result = await versionTool.func({})
-        
+
         // Should match the imported version from package.json
         expect(result.version).toBe(version)
       }
@@ -161,7 +162,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
       if ('func' in versionTool) {
         // Should work with empty object
         await expect(versionTool.func({})).resolves.toEqual({ version })
-        
+
         // Should work with undefined
         await expect(versionTool.func(undefined as any)).resolves.toEqual({ version })
       }
@@ -180,7 +181,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
     it('should have custom output schema with version', () => {
       expect(latestVersionTool.config.outputSchema).toBeDefined()
       expect(latestVersionTool.config.outputSchema).toHaveProperty('version')
-      
+
       // Should be a string type with description
       if (latestVersionTool.config.outputSchema) {
         const versionSchema = latestVersionTool.config.outputSchema.version
@@ -209,7 +210,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
       if ('func' in latestVersionTool) {
         const mockResponse = {
           ok: true,
-          json: jest.fn().mockResolvedValue({ latest: '2.1.0' })
+          json: jest.fn().mockResolvedValue({ latest: '2.1.0' }),
         }
         mockedFetch.mockResolvedValue(mockResponse as any)
 
@@ -225,15 +226,13 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
       if ('func' in latestVersionTool) {
         const mockResponse = {
           ok: true,
-          json: jest.fn().mockResolvedValue({ latest: '1.0.0' })
+          json: jest.fn().mockResolvedValue({ latest: '1.0.0' }),
         }
         mockedFetch.mockResolvedValue(mockResponse as any)
 
         await latestVersionTool.func({})
 
-        expect(mockedFetch).toHaveBeenCalledWith(
-          `https://registry.npmjs.org/-/package/${name}/dist-tags`
-        )
+        expect(mockedFetch).toHaveBeenCalledWith(`https://registry.npmjs.org/-/package/${name}/dist-tags`)
       }
     })
 
@@ -242,13 +241,11 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
         const mockResponse = {
           ok: false,
           status: 404,
-          statusText: 'Not Found'
+          statusText: 'Not Found',
         }
         mockedFetch.mockResolvedValue(mockResponse as any)
 
-        await expect(latestVersionTool.func({})).rejects.toThrow(
-          'Failed to fetch latest MCP server version: 404 Not Found'
-        )
+        await expect(latestVersionTool.func({})).rejects.toThrow('Failed to fetch latest MCP server version: 404 Not Found')
       }
     })
 
@@ -265,7 +262,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
       if ('func' in latestVersionTool) {
         const mockResponse = {
           ok: true,
-          json: jest.fn().mockRejectedValue(new Error('Invalid JSON'))
+          json: jest.fn().mockRejectedValue(new Error('Invalid JSON')),
         }
         mockedFetch.mockResolvedValue(mockResponse as any)
 
@@ -277,7 +274,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
       if ('func' in latestVersionTool) {
         const mockResponse = {
           ok: true,
-          json: jest.fn().mockResolvedValue(null)
+          json: jest.fn().mockResolvedValue(null),
         }
         mockedFetch.mockResolvedValue(mockResponse as any)
 
@@ -290,7 +287,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
       if ('func' in latestVersionTool) {
         const mockResponse = {
           ok: true,
-          json: jest.fn().mockResolvedValue({ other: 'data' })
+          json: jest.fn().mockResolvedValue({ other: 'data' }),
         }
         mockedFetch.mockResolvedValue(mockResponse as any)
 
@@ -303,7 +300,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
       if ('func' in latestVersionTool) {
         const mockResponse = {
           ok: true,
-          json: jest.fn().mockResolvedValue({ latest: null })
+          json: jest.fn().mockResolvedValue({ latest: null }),
         }
         mockedFetch.mockResolvedValue(mockResponse as any)
 
@@ -316,13 +313,13 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
       if ('func' in latestVersionTool) {
         const mockResponse = {
           ok: true,
-          json: jest.fn().mockResolvedValue({ latest: '1.0.0' })
+          json: jest.fn().mockResolvedValue({ latest: '1.0.0' }),
         }
         mockedFetch.mockResolvedValue(mockResponse as any)
 
         // Should work with empty object
         await expect(latestVersionTool.func({})).resolves.toBeDefined()
-        
+
         // Should work with undefined
         await expect(latestVersionTool.func(undefined as any)).resolves.toBeDefined()
       }
@@ -371,7 +368,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
     })
 
     it('should not have input schemas (no parameters required)', () => {
-      Object.values(getMCPServerToolsDefinitions).forEach(tool => {
+      Object.values(getMCPServerToolsDefinitions).forEach((tool) => {
         expect(tool.config.inputSchema).toBeUndefined()
       })
     })
@@ -379,19 +376,19 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
 
   describe('tool annotations', () => {
     it('should mark all tools as read-only', () => {
-      Object.values(getMCPServerToolsDefinitions).forEach(tool => {
+      Object.values(getMCPServerToolsDefinitions).forEach((tool) => {
         expect(tool.config.annotations?.readOnlyHint).toBe(true)
       })
     })
 
     it('should mark all tools as non-destructive', () => {
-      Object.values(getMCPServerToolsDefinitions).forEach(tool => {
+      Object.values(getMCPServerToolsDefinitions).forEach((tool) => {
         expect(tool.config.annotations?.destructiveHint).toBe(false)
       })
     })
 
     it('should mark all tools as idempotent', () => {
-      Object.values(getMCPServerToolsDefinitions).forEach(tool => {
+      Object.values(getMCPServerToolsDefinitions).forEach((tool) => {
         expect(tool.config.annotations?.idempotentHint).toBe(true)
       })
     })
@@ -404,7 +401,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
       // Local operations should not have openWorldHint
       expect(healthTool.config.annotations?.openWorldHint).toBe(false)
       expect(versionTool.config.annotations?.openWorldHint).toBe(false)
-      
+
       // External API call should have openWorldHint
       expect(latestVersionTool.config.annotations?.openWorldHint).toBe(true)
     })
@@ -419,10 +416,10 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
       if ('func' in healthTool && 'func' in versionTool && 'func' in latestVersionTool) {
         // Health tool uses Promise.resolve (sync function returning promise)
         expect(healthTool.func.toString()).toContain('Promise.resolve')
-        
+
         // Version tool uses Promise.resolve (sync function returning promise)
         expect(versionTool.func.toString()).toContain('Promise.resolve')
-        
+
         // Latest version tool is async function
         expect(latestVersionTool.func.constructor.name).toBe('AsyncFunction')
       }
@@ -448,11 +445,11 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
   describe('external API integration', () => {
     it('should construct correct npm registry URL', async () => {
       const latestVersionTool = getMCPServerToolsDefinitions[MCP_SERVER_TOOL_KEYS.READ_LATEST_MCP_SERVER_VERSION]
-      
+
       if ('func' in latestVersionTool) {
         const mockResponse = {
           ok: true,
-          json: jest.fn().mockResolvedValue({ latest: '1.0.0' })
+          json: jest.fn().mockResolvedValue({ latest: '1.0.0' }),
         }
         mockedFetch.mockResolvedValue(mockResponse as any)
 
@@ -468,16 +465,16 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
 
     it('should handle successful npm registry response', async () => {
       const latestVersionTool = getMCPServerToolsDefinitions[MCP_SERVER_TOOL_KEYS.READ_LATEST_MCP_SERVER_VERSION]
-      
+
       if ('func' in latestVersionTool) {
         const mockLatestVersion = '3.2.1'
         const mockResponse = {
           ok: true,
-          json: jest.fn().mockResolvedValue({ 
+          json: jest.fn().mockResolvedValue({
             latest: mockLatestVersion,
             beta: '3.3.0-beta.1',
-            alpha: '3.4.0-alpha.1'
-          })
+            alpha: '3.4.0-alpha.1',
+          }),
         }
         mockedFetch.mockResolvedValue(mockResponse as any)
 
@@ -490,37 +487,31 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
 
     it('should handle HTTP error responses with proper error messages', async () => {
       const latestVersionTool = getMCPServerToolsDefinitions[MCP_SERVER_TOOL_KEYS.READ_LATEST_MCP_SERVER_VERSION]
-      
+
       if ('func' in latestVersionTool) {
         const errorCases = [
           { status: 404, statusText: 'Not Found' },
           { status: 500, statusText: 'Internal Server Error' },
-          { status: 503, statusText: 'Service Unavailable' }
+          { status: 503, statusText: 'Service Unavailable' },
         ]
 
         for (const errorCase of errorCases) {
           mockedFetch.mockResolvedValue({
             ok: false,
             status: errorCase.status,
-            statusText: errorCase.statusText
+            statusText: errorCase.statusText,
           } as any)
 
-          await expect(latestVersionTool.func({})).rejects.toThrow(
-            `Failed to fetch latest MCP server version: ${errorCase.status} ${errorCase.statusText}`
-          )
+          await expect(latestVersionTool.func({})).rejects.toThrow(`Failed to fetch latest MCP server version: ${errorCase.status} ${errorCase.statusText}`)
         }
       }
     })
 
     it('should handle fetch timeout and network errors', async () => {
       const latestVersionTool = getMCPServerToolsDefinitions[MCP_SERVER_TOOL_KEYS.READ_LATEST_MCP_SERVER_VERSION]
-      
+
       if ('func' in latestVersionTool) {
-        const networkErrors = [
-          new Error('fetch timeout'),
-          new Error('Network request failed'),
-          new Error('DNS resolution failed')
-        ]
+        const networkErrors = [new Error('fetch timeout'), new Error('Network request failed'), new Error('DNS resolution failed')]
 
         for (const error of networkErrors) {
           mockedFetch.mockRejectedValue(error)
@@ -532,11 +523,11 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
 
     it('should handle malformed JSON responses', async () => {
       const latestVersionTool = getMCPServerToolsDefinitions[MCP_SERVER_TOOL_KEYS.READ_LATEST_MCP_SERVER_VERSION]
-      
+
       if ('func' in latestVersionTool) {
         const mockResponse = {
           ok: true,
-          json: jest.fn().mockRejectedValue(new SyntaxError('Unexpected token in JSON'))
+          json: jest.fn().mockRejectedValue(new SyntaxError('Unexpected token in JSON')),
         }
         mockedFetch.mockResolvedValue(mockResponse as any)
 
@@ -547,19 +538,19 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
 
   describe('tool consistency', () => {
     it('should have consistent title formatting', () => {
-      Object.values(getMCPServerToolsDefinitions).forEach(tool => {
+      Object.values(getMCPServerToolsDefinitions).forEach((tool) => {
         expect(tool.config.title).toBeDefined()
         expect(typeof tool.config.title).toBe('string')
-        
+
         if (tool.config.title) {
           expect(tool.config.title.length).toBeGreaterThan(0)
-          
+
           // Should not end with period
           expect(tool.config.title).not.toMatch(/\.$/)
-          
+
           // Should be properly capitalized
           expect(tool.config.title.charAt(0)).toMatch(/[A-Z]/)
-          
+
           // Should contain "MCP server"
           expect(tool.config.title.toLowerCase()).toContain('mcp server')
         }
@@ -567,14 +558,14 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
     })
 
     it('should have consistent description formatting', () => {
-      Object.values(getMCPServerToolsDefinitions).forEach(tool => {
+      Object.values(getMCPServerToolsDefinitions).forEach((tool) => {
         if (tool.config.description) {
           expect(typeof tool.config.description).toBe('string')
           expect(tool.config.description.length).toBeGreaterThan(0)
-          
+
           // Should end with period
           expect(tool.config.description).toMatch(/\.$/)
-          
+
           // Should be properly capitalized
           expect(tool.config.description.charAt(0)).toMatch(/[A-Z]/)
         }
@@ -582,7 +573,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
     })
 
     it('should have consistent annotation patterns', () => {
-      Object.values(getMCPServerToolsDefinitions).forEach(tool => {
+      Object.values(getMCPServerToolsDefinitions).forEach((tool) => {
         if (tool.config.annotations) {
           // All annotation values should be boolean when present
           if (tool.config.annotations.readOnlyHint !== undefined) {
@@ -602,7 +593,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
     })
 
     it('should have complete annotation coverage', () => {
-      Object.values(getMCPServerToolsDefinitions).forEach(tool => {
+      Object.values(getMCPServerToolsDefinitions).forEach((tool) => {
         expect(tool.config.annotations).toBeDefined()
         expect(tool.config.annotations?.readOnlyHint).toBeDefined()
         expect(tool.config.annotations?.destructiveHint).toBeDefined()
@@ -615,11 +606,11 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
   describe('package.json integration', () => {
     it('should use package.json name for npm registry URL', async () => {
       const latestVersionTool = getMCPServerToolsDefinitions[MCP_SERVER_TOOL_KEYS.READ_LATEST_MCP_SERVER_VERSION]
-      
+
       if ('func' in latestVersionTool) {
         const mockResponse = {
           ok: true,
-          json: jest.fn().mockResolvedValue({ latest: '1.0.0' })
+          json: jest.fn().mockResolvedValue({ latest: '1.0.0' }),
         }
         mockedFetch.mockResolvedValue(mockResponse as any)
 
@@ -632,7 +623,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
 
     it('should return package.json version for current version', async () => {
       const versionTool = getMCPServerToolsDefinitions[MCP_SERVER_TOOL_KEYS.READ_MCP_SERVER_VERSION]
-      
+
       if ('func' in versionTool) {
         const result = await versionTool.func({})
         expect(result.version).toBe(version)
@@ -649,28 +640,29 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
   describe('error handling patterns', () => {
     it('should handle all error types in latest version tool', async () => {
       const latestVersionTool = getMCPServerToolsDefinitions[MCP_SERVER_TOOL_KEYS.READ_LATEST_MCP_SERVER_VERSION]
-      
+
       if ('func' in latestVersionTool) {
         // Test various error scenarios
         const errorScenarios = [
           {
             name: 'HTTP 404',
             mock: () => mockedFetch.mockResolvedValue({ ok: false, status: 404, statusText: 'Not Found' } as any),
-            expectedError: 'Failed to fetch latest MCP server version: 404 Not Found'
+            expectedError: 'Failed to fetch latest MCP server version: 404 Not Found',
           },
           {
             name: 'Network error',
             mock: () => mockedFetch.mockRejectedValue(new Error('ECONNREFUSED')),
-            expectedError: 'ECONNREFUSED'
+            expectedError: 'ECONNREFUSED',
           },
           {
             name: 'JSON parse error',
-            mock: () => mockedFetch.mockResolvedValue({
-              ok: true,
-              json: jest.fn().mockRejectedValue(new SyntaxError('Invalid JSON'))
-            } as any),
-            expectedError: 'Invalid JSON'
-          }
+            mock: () =>
+              mockedFetch.mockResolvedValue({
+                ok: true,
+                json: jest.fn().mockRejectedValue(new SyntaxError('Invalid JSON')),
+              } as any),
+            expectedError: 'Invalid JSON',
+          },
         ]
 
         for (const scenario of errorScenarios) {
@@ -694,10 +686,10 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
   describe('response data validation', () => {
     it('should return valid health status', async () => {
       const healthTool = getMCPServerToolsDefinitions[MCP_SERVER_TOOL_KEYS.READ_INFRA_HEALTH]
-      
+
       if ('func' in healthTool) {
         const result = await healthTool.func({})
-        
+
         expect(result.healthStatus).toBe('ok')
         expect(typeof result.healthStatus).toBe('string')
       }
@@ -705,10 +697,10 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
 
     it('should return valid version string', async () => {
       const versionTool = getMCPServerToolsDefinitions[MCP_SERVER_TOOL_KEYS.READ_MCP_SERVER_VERSION]
-      
+
       if ('func' in versionTool) {
         const result = await versionTool.func({})
-        
+
         expect(typeof result.version).toBe('string')
         expect(result.version.length).toBeGreaterThan(0)
         expect(result.version).toMatch(/^\d+\.\d+\.\d+/) // Semver format
@@ -717,19 +709,14 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
 
     it('should handle various npm registry response formats', async () => {
       const latestVersionTool = getMCPServerToolsDefinitions[MCP_SERVER_TOOL_KEYS.READ_LATEST_MCP_SERVER_VERSION]
-      
+
       if ('func' in latestVersionTool) {
-        const responseFormats = [
-          { latest: '1.0.0' },
-          { latest: '2.1.3-beta.1' },
-          { latest: '0.0.1-alpha' },
-          { latest: '10.20.30' }
-        ]
+        const responseFormats = [{ latest: '1.0.0' }, { latest: '2.1.3-beta.1' }, { latest: '0.0.1-alpha' }, { latest: '10.20.30' }]
 
         for (const format of responseFormats) {
           mockedFetch.mockResolvedValue({
             ok: true,
-            json: jest.fn().mockResolvedValue(format)
+            json: jest.fn().mockResolvedValue(format),
           } as any)
 
           const result = await latestVersionTool.func({})
@@ -749,15 +736,11 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
         // Mock successful latest version fetch
         mockedFetch.mockResolvedValue({
           ok: true,
-          json: jest.fn().mockResolvedValue({ latest: '2.0.0' })
+          json: jest.fn().mockResolvedValue({ latest: '2.0.0' }),
         } as any)
 
         // Execute all tools
-        const [healthResult, versionResult, latestResult] = await Promise.all([
-          healthTool.func({}),
-          versionTool.func({}),
-          latestVersionTool.func({})
-        ])
+        const [healthResult, versionResult, latestResult] = await Promise.all([healthTool.func({}), versionTool.func({}), latestVersionTool.func({})])
 
         // Verify complete server info
         expect(healthResult.healthStatus).toBe('ok')
@@ -775,7 +758,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
       expect(tools).toHaveProperty(MCP_SERVER_TOOL_KEYS.READ_LATEST_MCP_SERVER_VERSION)
 
       // All should be introspection tools (no external state modification)
-      Object.values(tools).forEach(tool => {
+      Object.values(tools).forEach((tool) => {
         expect(tool.config.annotations?.destructiveHint).toBe(false)
         expect(tool.config.annotations?.readOnlyHint).toBe(true)
       })
@@ -789,10 +772,7 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
 
       if ('func' in healthTool && 'func' in versionTool) {
         const start = Date.now()
-        await Promise.all([
-          healthTool.func({}),
-          versionTool.func({})
-        ])
+        await Promise.all([healthTool.func({}), versionTool.func({})])
         const duration = Date.now() - start
 
         // Local operations should be very fast (< 10ms)
@@ -802,14 +782,14 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
 
     it('should handle concurrent executions', async () => {
       const healthTool = getMCPServerToolsDefinitions[MCP_SERVER_TOOL_KEYS.READ_INFRA_HEALTH]
-      
+
       if ('func' in healthTool) {
         // Execute multiple concurrent health checks
         const promises = Array.from({ length: 10 }, () => healthTool.func({}))
         const results = await Promise.all(promises)
 
         // All should return the same result
-        results.forEach(result => {
+        results.forEach((result) => {
           expect(result).toEqual({ healthStatus: 'ok' })
         })
       }
@@ -817,18 +797,16 @@ describe('libs/quant-connect-mcp/src/tools/mcp-server-tools', () => {
 
     it('should handle external API rate limiting gracefully', async () => {
       const latestVersionTool = getMCPServerToolsDefinitions[MCP_SERVER_TOOL_KEYS.READ_LATEST_MCP_SERVER_VERSION]
-      
+
       if ('func' in latestVersionTool) {
         // Simulate rate limiting response
         mockedFetch.mockResolvedValue({
           ok: false,
           status: 429,
-          statusText: 'Too Many Requests'
+          statusText: 'Too Many Requests',
         } as any)
 
-        await expect(latestVersionTool.func({})).rejects.toThrow(
-          'Failed to fetch latest MCP server version: 429 Too Many Requests'
-        )
+        await expect(latestVersionTool.func({})).rejects.toThrow('Failed to fetch latest MCP server version: 429 Too Many Requests')
       }
     })
   })

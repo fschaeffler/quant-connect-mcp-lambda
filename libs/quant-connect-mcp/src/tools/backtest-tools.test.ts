@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { QCClient } from '@fschaeffler/quant-connect-client'
 import {
   createBacktestBody,
@@ -8,14 +9,12 @@ import {
   listBacktestsResponse,
   readBacktestBody,
   readBacktestChartBody,
-  readBacktestChartResponse,
   readBacktestOrderBody,
   readBacktestOrderResponse,
   readBacktestResponse,
   readBacktestsInsightsBody,
   readBacktestsInsightsResponse,
   readBacktestsReportBody,
-  readBacktestsReportResponse,
   updateBacktestBody,
   updateBacktestResponse,
 } from '@fschaeffler/quant-connect-types'
@@ -45,12 +44,12 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
           name: 'Test Backtest',
           charts: { chart1: 'data' },
           totalPerformance: {
-            closedTrades: ['trade1', 'trade2']
+            closedTrades: ['trade1', 'trade2'],
           },
-          rollingWindow: { window: 'data' }
+          rollingWindow: { window: 'data' },
         },
-        orders: ['order1', 'order2']
-      })
+        orders: ['order1', 'order2'],
+      }),
     }
 
     mockedQCClient.getInstance.mockReturnValue(mockQCClientInstance)
@@ -67,7 +66,7 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
 
     it('should contain all expected backtest tools', () => {
       const toolKeys = Object.keys(getBacktestToolsDefinitions)
-      
+
       expect(toolKeys).toContain(BACKTEST_TOOL_KEYS.CREATE_BACKTEST)
       expect(toolKeys).toContain(BACKTEST_TOOL_KEYS.READ_BACKTEST)
       expect(toolKeys).toContain(BACKTEST_TOOL_KEYS.READ_BACKTEST_REDUCED)
@@ -170,7 +169,7 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
         const result = await reducedTool.func(mockParams)
 
         expect(mockQCClientInstance.post).toHaveBeenCalledWith('backtests/read', mockParams)
-        
+
         // Should call readBacktestResponse.parse
         expect(result).toBeDefined()
       }
@@ -180,15 +179,15 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
       const mockData = {
         success: true,
         orders: ['order1', 'order2'],
-        backtest: { id: 123 }
+        backtest: { id: 123 },
       }
-      
+
       mockQCClientInstance.post.mockResolvedValue(mockData)
-      
+
       if ('func' in reducedTool) {
         await reducedTool.func({ backtestId: 123 })
       }
-      
+
       // The function should delete the orders property
       expect(mockData.orders).toBeUndefined()
     })
@@ -198,16 +197,16 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
         success: true,
         backtest: {
           id: 123,
-          charts: { chart1: 'data', chart2: 'data' }
-        }
+          charts: { chart1: 'data', chart2: 'data' },
+        },
       }
-      
+
       mockQCClientInstance.post.mockResolvedValue(mockData)
-      
+
       if ('func' in reducedTool) {
         await reducedTool.func({ backtestId: 123 })
       }
-      
+
       // The function should delete the charts property
       expect(mockData.backtest.charts).toBeUndefined()
     })
@@ -219,17 +218,17 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
           id: 123,
           totalPerformance: {
             closedTrades: ['trade1', 'trade2'],
-            otherMetric: 'preserved'
-          }
-        }
+            otherMetric: 'preserved',
+          },
+        },
       }
-      
+
       mockQCClientInstance.post.mockResolvedValue(mockData)
-      
+
       if ('func' in reducedTool) {
         await reducedTool.func({ backtestId: 123 })
       }
-      
+
       // Should delete closedTrades but preserve other properties
       expect(mockData.backtest.totalPerformance.closedTrades).toBeUndefined()
       expect(mockData.backtest.totalPerformance.otherMetric).toBe('preserved')
@@ -241,16 +240,16 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
         backtest: {
           id: 123,
           rollingWindow: { window: 'data' },
-          otherProperty: 'preserved'
-        }
+          otherProperty: 'preserved',
+        },
       }
-      
+
       mockQCClientInstance.post.mockResolvedValue(mockData)
-      
+
       if ('func' in reducedTool) {
         await reducedTool.func({ backtestId: 123 })
       }
-      
+
       // Should delete rollingWindow but preserve other properties
       expect(mockData.backtest.rollingWindow).toBeUndefined()
       expect(mockData.backtest.otherProperty).toBe('preserved')
@@ -260,21 +259,21 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
       const mockData = {
         success: true,
         backtest: {
-          id: 123
+          id: 123,
           // Missing optional properties
-        }
+        },
       }
-      
+
       mockQCClientInstance.post.mockResolvedValue(mockData)
-      
-        if ('func' in reducedTool) {
-          await expect(reducedTool.func({ backtestId: 123 })).resolves.toBeDefined()
-        }
+
+      if ('func' in reducedTool) {
+        await expect(reducedTool.func({ backtestId: 123 })).resolves.toBeDefined()
+      }
     })
 
     it('should handle null/undefined data by throwing validation error', async () => {
       mockQCClientInstance.post.mockResolvedValue(null)
-      
+
       if ('func' in reducedTool) {
         await expect(reducedTool.func({ backtestId: 123 })).rejects.toThrow()
       }
@@ -282,15 +281,15 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
 
     it('should handle missing backtest property', async () => {
       const mockData = {
-        success: true
+        success: true,
         // Missing backtest property
       }
-      
+
       mockQCClientInstance.post.mockResolvedValue(mockData)
-      
-        if ('func' in reducedTool) {
-          await expect(reducedTool.func({ backtestId: 123 })).resolves.toBeDefined()
-        }
+
+      if ('func' in reducedTool) {
+        await expect(reducedTool.func({ backtestId: 123 })).resolves.toBeDefined()
+      }
     })
   })
 
@@ -486,7 +485,7 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
       // The chart and report tools use mergeUnionToRawShape for their output schemas
       const chartTool = getBacktestToolsDefinitions[BACKTEST_TOOL_KEYS.READ_BACKTEST_CHART]
       const reportTool = getBacktestToolsDefinitions[BACKTEST_TOOL_KEYS.READ_BACKTEST_REPORT]
-      
+
       // These tools should have output schema properties configured
       expect(chartTool.config).toHaveProperty('outputSchema')
       expect(reportTool.config).toHaveProperty('outputSchema')
@@ -515,45 +514,37 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
         BACKTEST_TOOL_KEYS.READ_BACKTEST_CHART,
         BACKTEST_TOOL_KEYS.READ_BACKTEST_ORDERS,
         BACKTEST_TOOL_KEYS.READ_BACKTEST_INSIGHTS,
-        BACKTEST_TOOL_KEYS.READ_BACKTEST_REPORT
+        BACKTEST_TOOL_KEYS.READ_BACKTEST_REPORT,
       ]
 
-      readOnlyTools.forEach(toolKey => {
+      readOnlyTools.forEach((toolKey) => {
         const tool = getBacktestToolsDefinitions[toolKey]
         expect(tool.config.annotations?.readOnlyHint).toBe(true)
       })
     })
 
     it('should categorize destructive tools correctly', () => {
-      const destructiveTools = [
-        BACKTEST_TOOL_KEYS.DELETE_BACKTEST
-      ]
+      const destructiveTools = [BACKTEST_TOOL_KEYS.DELETE_BACKTEST]
 
-      destructiveTools.forEach(toolKey => {
+      destructiveTools.forEach((toolKey) => {
         const tool = getBacktestToolsDefinitions[toolKey]
         expect(tool.config.annotations?.destructiveHint).toBe(true)
       })
     })
 
     it('should categorize idempotent tools correctly', () => {
-      const idempotentTools = [
-        BACKTEST_TOOL_KEYS.UPDATE_BACKTEST,
-        BACKTEST_TOOL_KEYS.DELETE_BACKTEST
-      ]
+      const idempotentTools = [BACKTEST_TOOL_KEYS.UPDATE_BACKTEST, BACKTEST_TOOL_KEYS.DELETE_BACKTEST]
 
-      idempotentTools.forEach(toolKey => {
+      idempotentTools.forEach((toolKey) => {
         const tool = getBacktestToolsDefinitions[toolKey]
         expect(tool.config.annotations?.idempotentHint).toBe(true)
       })
     })
 
     it('should categorize non-idempotent tools correctly', () => {
-      const nonIdempotentTools = [
-        BACKTEST_TOOL_KEYS.CREATE_BACKTEST,
-        BACKTEST_TOOL_KEYS.READ_BACKTEST
-      ]
+      const nonIdempotentTools = [BACKTEST_TOOL_KEYS.CREATE_BACKTEST, BACKTEST_TOOL_KEYS.READ_BACKTEST]
 
-      nonIdempotentTools.forEach(toolKey => {
+      nonIdempotentTools.forEach((toolKey) => {
         const tool = getBacktestToolsDefinitions[toolKey]
         expect(tool.config.annotations?.idempotentHint).toBe(false)
       })
@@ -570,11 +561,19 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
       const listTool = tools[BACKTEST_TOOL_KEYS.LIST_BACKTESTS]
       const updateTool = tools[BACKTEST_TOOL_KEYS.UPDATE_BACKTEST]
       const deleteTool = tools[BACKTEST_TOOL_KEYS.DELETE_BACKTEST]
-      
-      if ('url' in createTool) expect(createTool.url).toBe('backtests/create')
-      if ('url' in listTool) expect(listTool.url).toBe('backtests/list')
-      if ('url' in updateTool) expect(updateTool.url).toBe('backtests/update')
-      if ('url' in deleteTool) expect(deleteTool.url).toBe('backtests/delete')
+
+      if ('url' in createTool) {
+        expect(createTool.url).toBe('backtests/create')
+      }
+      if ('url' in listTool) {
+        expect(listTool.url).toBe('backtests/list')
+      }
+      if ('url' in updateTool) {
+        expect(updateTool.url).toBe('backtests/update')
+      }
+      if ('url' in deleteTool) {
+        expect(deleteTool.url).toBe('backtests/delete')
+      }
 
       // Read operations
       const readTool = tools[BACKTEST_TOOL_KEYS.READ_BACKTEST]
@@ -582,16 +581,26 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
       const chartTool = tools[BACKTEST_TOOL_KEYS.READ_BACKTEST_CHART]
       const insightsTool = tools[BACKTEST_TOOL_KEYS.READ_BACKTEST_INSIGHTS]
       const reportTool = tools[BACKTEST_TOOL_KEYS.READ_BACKTEST_REPORT]
-      
-      if ('url' in readTool) expect(readTool.url).toBe('backtests/read')
-      if ('url' in ordersTool) expect(ordersTool.url).toBe('backtests/orders/read')
-      if ('url' in chartTool) expect(chartTool.url).toBe('backtests/chart/read')
-      if ('url' in insightsTool) expect(insightsTool.url).toBe('backtests/read/insights')
-      if ('url' in reportTool) expect(reportTool.url).toBe('backtests/read/report')
+
+      if ('url' in readTool) {
+        expect(readTool.url).toBe('backtests/read')
+      }
+      if ('url' in ordersTool) {
+        expect(ordersTool.url).toBe('backtests/orders/read')
+      }
+      if ('url' in chartTool) {
+        expect(chartTool.url).toBe('backtests/chart/read')
+      }
+      if ('url' in insightsTool) {
+        expect(insightsTool.url).toBe('backtests/read/insights')
+      }
+      if ('url' in reportTool) {
+        expect(reportTool.url).toBe('backtests/read/report')
+      }
     })
 
     it('should not have leading slashes in URLs', () => {
-      Object.values(getBacktestToolsDefinitions).forEach(tool => {
+      Object.values(getBacktestToolsDefinitions).forEach((tool) => {
         if ('url' in tool) {
           expect(tool.url).not.toMatch(/^\//)
         }
@@ -599,9 +608,9 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
     })
 
     it('should have valid URL formats', () => {
-      Object.values(getBacktestToolsDefinitions).forEach(tool => {
+      Object.values(getBacktestToolsDefinitions).forEach((tool) => {
         if ('url' in tool) {
-          expect(tool.url).toMatch(/^[a-z]+[a-z\/]*[a-z]$/)
+          expect(tool.url).toMatch(/^[a-z]+[a-z\\/]*[a-z]$/)
           expect(tool.url).not.toContain(' ')
           expect(tool.url).not.toContain('_')
         }
@@ -612,16 +621,15 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
   describe('tool type distribution', () => {
     it('should have mostly QC API tools', () => {
       const tools = Object.values(getBacktestToolsDefinitions)
-      const qcApiTools = tools.filter(tool => 'url' in tool)
-      const customTools = tools.filter(tool => 'func' in tool)
+      const qcApiTools = tools.filter((tool) => 'url' in tool)
+      const customTools = tools.filter((tool) => 'func' in tool)
 
       expect(qcApiTools.length).toBe(9)
       expect(customTools.length).toBe(1)
     })
 
     it('should have one custom tool for data reduction', () => {
-      const customTools = Object.entries(getBacktestToolsDefinitions)
-        .filter(([, tool]) => 'func' in tool)
+      const customTools = Object.entries(getBacktestToolsDefinitions).filter(([, tool]) => 'func' in tool)
 
       expect(customTools).toHaveLength(1)
       expect(customTools[0][0]).toBe(BACKTEST_TOOL_KEYS.READ_BACKTEST_REDUCED)
@@ -631,7 +639,7 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
   describe('data processing logic', () => {
     it('should use Object.hasOwn for property checking', async () => {
       const reducedTool = getBacktestToolsDefinitions[BACKTEST_TOOL_KEYS.READ_BACKTEST_REDUCED]
-      
+
       // Mock Object.hasOwn
       const originalHasOwn = Object.hasOwn
       Object.hasOwn = jest.fn().mockReturnValue(true)
@@ -651,26 +659,26 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
 
     it('should handle nested property deletion safely', async () => {
       const reducedTool = getBacktestToolsDefinitions[BACKTEST_TOOL_KEYS.READ_BACKTEST_REDUCED]
-      
+
       // Test with deeply nested structure
       const mockData = {
         backtest: {
           totalPerformance: {
             closedTrades: ['trade1'],
             nestedObject: {
-              deepProperty: 'preserved'
-            }
+              deepProperty: 'preserved',
+            },
           },
-          otherData: 'preserved'
-        }
+          otherData: 'preserved',
+        },
       }
-      
+
       mockQCClientInstance.post.mockResolvedValue(mockData)
-      
+
       if ('func' in reducedTool) {
         await reducedTool.func({ backtestId: 123 })
       }
-      
+
       // Should only delete the specific property
       expect(mockData.backtest.totalPerformance.closedTrades).toBeUndefined()
       expect(mockData.backtest.totalPerformance.nestedObject.deepProperty).toBe('preserved')
@@ -679,21 +687,21 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
 
     it('should handle partial data structures', async () => {
       const reducedTool = getBacktestToolsDefinitions[BACKTEST_TOOL_KEYS.READ_BACKTEST_REDUCED]
-      
+
       // Test with missing intermediate objects
       const mockData = {
         backtest: {
           // Missing totalPerformance
-          charts: { chart1: 'data' }
-        }
+          charts: { chart1: 'data' },
+        },
       }
-      
+
       mockQCClientInstance.post.mockResolvedValue(mockData)
-      
-        if ('func' in reducedTool) {
-          await expect(reducedTool.func({ backtestId: 123 })).resolves.toBeDefined()
-        }
-      
+
+      if ('func' in reducedTool) {
+        await expect(reducedTool.func({ backtestId: 123 })).resolves.toBeDefined()
+      }
+
       // Should delete charts but not crash on missing totalPerformance
       expect(mockData.backtest.charts).toBeUndefined()
     })
@@ -702,7 +710,7 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
   describe('error handling and edge cases', () => {
     it('should handle QCClient errors in reduced tool', async () => {
       const reducedTool = getBacktestToolsDefinitions[BACKTEST_TOOL_KEYS.READ_BACKTEST_REDUCED]
-      
+
       const qcError = new Error('API Error')
       mockQCClientInstance.post.mockRejectedValue(qcError)
 
@@ -713,7 +721,7 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
 
     it('should handle schema parsing errors in reduced tool', async () => {
       const reducedTool = getBacktestToolsDefinitions[BACKTEST_TOOL_KEYS.READ_BACKTEST_REDUCED]
-      
+
       // Mock readBacktestResponse.parse to throw
       const originalParse = readBacktestResponse.parse
       readBacktestResponse.parse = jest.fn().mockImplementation(() => {
@@ -732,42 +740,42 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
 
     it('should handle empty response data', async () => {
       const reducedTool = getBacktestToolsDefinitions[BACKTEST_TOOL_KEYS.READ_BACKTEST_REDUCED]
-      
+
       mockQCClientInstance.post.mockResolvedValue({})
 
-        if ('func' in reducedTool) {
-          await expect(reducedTool.func({ backtestId: 123 })).resolves.toBeDefined()
-        }
+      if ('func' in reducedTool) {
+        await expect(reducedTool.func({ backtestId: 123 })).resolves.toBeDefined()
+      }
     })
   })
 
   describe('tool consistency', () => {
     it('should have consistent title formatting', () => {
-      Object.values(getBacktestToolsDefinitions).forEach(tool => {
-      expect(tool.config.title).toBeDefined()
-      expect(typeof tool.config.title).toBe('string')
-      
-      if (tool.config.title) {
-        expect(tool.config.title.length).toBeGreaterThan(0)
-        
-        // Should not end with period
-        expect(tool.config.title).not.toMatch(/\.$/)
-        
-        // Should be properly capitalized
-        expect(tool.config.title.charAt(0)).toMatch(/[A-Z]/)
-      }
+      Object.values(getBacktestToolsDefinitions).forEach((tool) => {
+        expect(tool.config.title).toBeDefined()
+        expect(typeof tool.config.title).toBe('string')
+
+        if (tool.config.title) {
+          expect(tool.config.title.length).toBeGreaterThan(0)
+
+          // Should not end with period
+          expect(tool.config.title).not.toMatch(/\.$/)
+
+          // Should be properly capitalized
+          expect(tool.config.title.charAt(0)).toMatch(/[A-Z]/)
+        }
       })
     })
 
     it('should have consistent description formatting', () => {
-      Object.values(getBacktestToolsDefinitions).forEach(tool => {
+      Object.values(getBacktestToolsDefinitions).forEach((tool) => {
         if (tool.config.description) {
           expect(typeof tool.config.description).toBe('string')
           expect(tool.config.description.length).toBeGreaterThan(0)
-          
+
           // Should end with period
           expect(tool.config.description).toMatch(/\.$/)
-          
+
           // Should be properly capitalized
           expect(tool.config.description.charAt(0)).toMatch(/[A-Z]/)
         }
@@ -775,7 +783,7 @@ describe('libs/quant-connect-mcp/src/tools/backtest-tools', () => {
     })
 
     it('should have consistent annotation patterns', () => {
-      Object.values(getBacktestToolsDefinitions).forEach(tool => {
+      Object.values(getBacktestToolsDefinitions).forEach((tool) => {
         if (tool.config.annotations) {
           // All annotation values should be boolean when present
           if (tool.config.annotations.readOnlyHint !== undefined) {

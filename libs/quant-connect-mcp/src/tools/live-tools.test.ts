@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { QCClient } from '@fschaeffler/quant-connect-client'
 import {
   authorizeLiveAuth0Body,
@@ -10,13 +11,11 @@ import {
   readLiveAuth0Response,
   readLiveBody,
   readLiveChartBody,
-  readLiveChartResponse,
   readLiveInsightBody,
   readLiveInsightResponse,
   readLiveLogBody,
   readLiveLogResponse,
   readLiveOrderBody,
-  readLiveOrderResponse,
   readLivePortfolioBody,
   readLivePortfolioResponse,
   stopLiveBody,
@@ -43,17 +42,17 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
     mockQCClientInstance = {
       postWithRawResponse: jest.fn().mockResolvedValue({
         headers: {
-          'Location': 'https://auth.example.com/callback?code=abc123'
-        }
+          Location: 'https://auth.example.com/callback?code=abc123',
+        },
       }),
       post: jest.fn().mockResolvedValue({
         success: true,
         liveAlgorithm: {
           id: 'live-123',
           name: 'Test Live Algorithm',
-          status: 'running'
-        }
-      })
+          status: 'running',
+        },
+      }),
     }
 
     mockedQCClient.getInstance.mockReturnValue(mockQCClientInstance)
@@ -70,7 +69,7 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
 
     it('should contain all expected live tools', () => {
       const toolKeys = Object.keys(getLiveToolsDefinitions)
-      
+
       expect(toolKeys).toContain(LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP1)
       expect(toolKeys).toContain(LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP2)
       expect(toolKeys).toContain(LIVE_TOOL_KEYS.CREATE_LIVE_ALGORITHM)
@@ -125,13 +124,9 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
       if ('func' in authStep1Tool) {
         const result = await authStep1Tool.func({})
 
-        expect(mockQCClientInstance.postWithRawResponse).toHaveBeenCalledWith(
-          '/live/auth0/authorize',
-          { redirect: false },
-          { timeout: 5 * 60 * 1000 }
-        )
+        expect(mockQCClientInstance.postWithRawResponse).toHaveBeenCalledWith('/live/auth0/authorize', { redirect: false }, { timeout: 5 * 60 * 1000 })
         expect(result).toEqual({
-          authURL: 'https://auth.example.com/callback?code=abc123'
+          authURL: 'https://auth.example.com/callback?code=abc123',
         })
       }
     })
@@ -141,8 +136,8 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
         // Test lowercase 'location' header
         mockQCClientInstance.postWithRawResponse.mockResolvedValue({
           headers: {
-            'location': 'https://auth.example.com/callback?code=xyz789'
-          }
+            location: 'https://auth.example.com/callback?code=xyz789',
+          },
         })
 
         const result = await authStep1Tool.func({})
@@ -153,7 +148,7 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
     it('should handle missing Location header', async () => {
       if ('func' in authStep1Tool) {
         mockQCClientInstance.postWithRawResponse.mockResolvedValue({
-          headers: {}
+          headers: {},
         })
 
         const result = await authStep1Tool.func({})
@@ -491,7 +486,7 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
       // The chart and orders tools use mergeUnionToRawShape for their output schemas
       const chartTool = getLiveToolsDefinitions[LIVE_TOOL_KEYS.READ_LIVE_CHART]
       const ordersTool = getLiveToolsDefinitions[LIVE_TOOL_KEYS.READ_LIVE_ORDERS]
-      
+
       // These tools should have output schema properties configured
       expect(chartTool.config).toHaveProperty('outputSchema')
       expect(ordersTool.config).toHaveProperty('outputSchema')
@@ -522,22 +517,19 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
         LIVE_TOOL_KEYS.READ_LIVE_LOGS,
         LIVE_TOOL_KEYS.READ_LIVE_PORTFOLIO,
         LIVE_TOOL_KEYS.READ_LIVE_ORDERS,
-        LIVE_TOOL_KEYS.READ_LIVE_INSIGHTS
+        LIVE_TOOL_KEYS.READ_LIVE_INSIGHTS,
       ]
 
-      readOnlyTools.forEach(toolKey => {
+      readOnlyTools.forEach((toolKey) => {
         const tool = getLiveToolsDefinitions[toolKey]
         expect(tool.config.annotations?.readOnlyHint).toBe(true)
       })
     })
 
     it('should categorize destructive tools correctly', () => {
-      const destructiveTools = [
-        LIVE_TOOL_KEYS.STOP_LIVE_ALGORITHM,
-        LIVE_TOOL_KEYS.LIQUIDATE_LIVE_ALGORITHM
-      ]
+      const destructiveTools = [LIVE_TOOL_KEYS.STOP_LIVE_ALGORITHM, LIVE_TOOL_KEYS.LIQUIDATE_LIVE_ALGORITHM]
 
-      destructiveTools.forEach(toolKey => {
+      destructiveTools.forEach((toolKey) => {
         const tool = getLiveToolsDefinitions[toolKey]
         expect(tool.config.annotations?.destructiveHint).toBe(true)
       })
@@ -554,21 +546,19 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
         LIVE_TOOL_KEYS.READ_LIVE_ORDERS,
         LIVE_TOOL_KEYS.READ_LIVE_INSIGHTS,
         LIVE_TOOL_KEYS.STOP_LIVE_ALGORITHM,
-        LIVE_TOOL_KEYS.LIQUIDATE_LIVE_ALGORITHM
+        LIVE_TOOL_KEYS.LIQUIDATE_LIVE_ALGORITHM,
       ]
 
-      idempotentTools.forEach(toolKey => {
+      idempotentTools.forEach((toolKey) => {
         const tool = getLiveToolsDefinitions[toolKey]
         expect(tool.config.annotations?.idempotentHint).toBe(true)
       })
     })
 
     it('should categorize non-idempotent tools correctly', () => {
-      const nonIdempotentTools = [
-        LIVE_TOOL_KEYS.CREATE_LIVE_ALGORITHM
-      ]
+      const nonIdempotentTools = [LIVE_TOOL_KEYS.CREATE_LIVE_ALGORITHM]
 
-      nonIdempotentTools.forEach(toolKey => {
+      nonIdempotentTools.forEach((toolKey) => {
         const tool = getLiveToolsDefinitions[toolKey]
         expect(tool.config.annotations?.idempotentHint).toBe(false)
       })
@@ -581,16 +571,24 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
 
       // Authorization tools
       const authStep2Tool = tools[LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP2]
-      if ('url' in authStep2Tool) expect(authStep2Tool.url).toBe('/live/auth0/read')
+      if ('url' in authStep2Tool) {
+        expect(authStep2Tool.url).toBe('/live/auth0/read')
+      }
 
       // Basic CRUD operations
       const createTool = tools[LIVE_TOOL_KEYS.CREATE_LIVE_ALGORITHM]
       const readTool = tools[LIVE_TOOL_KEYS.READ_LIVE_ALGORITHM]
       const listTool = tools[LIVE_TOOL_KEYS.LIST_LIVE_ALGORITHMS]
-      
-      if ('url' in createTool) expect(createTool.url).toBe('/live/create')
-      if ('url' in readTool) expect(readTool.url).toBe('/live/read')
-      if ('url' in listTool) expect(listTool.url).toBe('/live/list')
+
+      if ('url' in createTool) {
+        expect(createTool.url).toBe('/live/create')
+      }
+      if ('url' in readTool) {
+        expect(readTool.url).toBe('/live/read')
+      }
+      if ('url' in listTool) {
+        expect(listTool.url).toBe('/live/list')
+      }
 
       // Read operations for different data types
       const chartTool = tools[LIVE_TOOL_KEYS.READ_LIVE_CHART]
@@ -598,23 +596,37 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
       const portfolioTool = tools[LIVE_TOOL_KEYS.READ_LIVE_PORTFOLIO]
       const ordersTool = tools[LIVE_TOOL_KEYS.READ_LIVE_ORDERS]
       const insightsTool = tools[LIVE_TOOL_KEYS.READ_LIVE_INSIGHTS]
-      
-      if ('url' in chartTool) expect(chartTool.url).toBe('/live/chart/read')
-      if ('url' in logsTool) expect(logsTool.url).toBe('/live/logs/read')
-      if ('url' in portfolioTool) expect(portfolioTool.url).toBe('/live/portfolio/read')
-      if ('url' in ordersTool) expect(ordersTool.url).toBe('/live/orders/read')
-      if ('url' in insightsTool) expect(insightsTool.url).toBe('/live/insights/read')
+
+      if ('url' in chartTool) {
+        expect(chartTool.url).toBe('/live/chart/read')
+      }
+      if ('url' in logsTool) {
+        expect(logsTool.url).toBe('/live/logs/read')
+      }
+      if ('url' in portfolioTool) {
+        expect(portfolioTool.url).toBe('/live/portfolio/read')
+      }
+      if ('url' in ordersTool) {
+        expect(ordersTool.url).toBe('/live/orders/read')
+      }
+      if ('url' in insightsTool) {
+        expect(insightsTool.url).toBe('/live/insights/read')
+      }
 
       // Control operations
       const stopTool = tools[LIVE_TOOL_KEYS.STOP_LIVE_ALGORITHM]
       const liquidateTool = tools[LIVE_TOOL_KEYS.LIQUIDATE_LIVE_ALGORITHM]
-      
-      if ('url' in stopTool) expect(stopTool.url).toBe('/live/update/stop')
-      if ('url' in liquidateTool) expect(liquidateTool.url).toBe('/live/update/liquidate')
+
+      if ('url' in stopTool) {
+        expect(stopTool.url).toBe('/live/update/stop')
+      }
+      if ('url' in liquidateTool) {
+        expect(liquidateTool.url).toBe('/live/update/liquidate')
+      }
     })
 
     it('should have leading slashes in URLs (different from backtest tools)', () => {
-      Object.values(getLiveToolsDefinitions).forEach(tool => {
+      Object.values(getLiveToolsDefinitions).forEach((tool) => {
         if ('url' in tool) {
           expect(tool.url).toMatch(/^\//)
         }
@@ -622,9 +634,9 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
     })
 
     it('should have valid URL formats with leading slash', () => {
-      Object.values(getLiveToolsDefinitions).forEach(tool => {
+      Object.values(getLiveToolsDefinitions).forEach((tool) => {
         if ('url' in tool) {
-          expect(tool.url).toMatch(/^\/[a-z0-9]+[a-z0-9\/]*[a-z0-9]$/)
+          expect(tool.url).toMatch(/^\/[a-z0-9]+[a-z0-9\\/]*[a-z0-9]$/)
           expect(tool.url).not.toContain(' ')
           expect(tool.url).not.toContain('_')
         }
@@ -635,16 +647,15 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
   describe('tool type distribution', () => {
     it('should have mostly QC API tools', () => {
       const tools = Object.values(getLiveToolsDefinitions)
-      const qcApiTools = tools.filter(tool => 'url' in tool)
-      const customTools = tools.filter(tool => 'func' in tool)
+      const qcApiTools = tools.filter((tool) => 'url' in tool)
+      const customTools = tools.filter((tool) => 'func' in tool)
 
       expect(qcApiTools.length).toBe(11)
       expect(customTools.length).toBe(1)
     })
 
     it('should have one custom tool for authorization step 1', () => {
-      const customTools = Object.entries(getLiveToolsDefinitions)
-        .filter(([, tool]) => 'func' in tool)
+      const customTools = Object.entries(getLiveToolsDefinitions).filter(([, tool]) => 'func' in tool)
 
       expect(customTools).toHaveLength(1)
       expect(customTools[0][0]).toBe(LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP1)
@@ -658,7 +669,7 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
 
       expect(step1.config.title).toContain('Step 1')
       expect(step2.config.title).toContain('Step 2')
-      
+
       // Both should use the same input schema
       expect(step1.config.inputSchema).toBe(authorizeLiveAuth0Body.shape)
       expect(step2.config.inputSchema).toBe(authorizeLiveAuth0Body.shape)
@@ -671,7 +682,7 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
       // Both should mention two-step process
       expect(step1.config.description).toContain('Authorization process is always in two steps')
       expect(step2.config.description).toContain('Authorization process is always in two steps')
-      
+
       // Both should mention URL and config storage
       expect(step1.config.description).toContain('URL is returned')
       expect(step2.config.description).toContain('authorization config is stored')
@@ -682,14 +693,14 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
       const step2 = getLiveToolsDefinitions[LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP2]
 
       expect('func' in step1).toBe(true) // Custom function
-      expect('url' in step2).toBe(true)  // QC API endpoint
+      expect('url' in step2).toBe(true) // QC API endpoint
     })
   })
 
   describe('error handling and edge cases', () => {
     it('should handle QCClient errors in authorization step 1', async () => {
       const authTool = getLiveToolsDefinitions[LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP1]
-      
+
       const qcError = new Error('Authorization API Error')
       mockQCClientInstance.postWithRawResponse.mockRejectedValue(qcError)
 
@@ -700,39 +711,39 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
 
     it('should throw error when response headers are undefined (bug in implementation)', async () => {
       const authTool = getLiveToolsDefinitions[LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP1]
-      
+
       mockQCClientInstance.postWithRawResponse.mockResolvedValue({
-        headers: undefined
+        headers: undefined,
       })
 
       if ('func' in authTool) {
-        await expect(authTool.func({})).rejects.toThrow("Cannot read properties of undefined")
+        await expect(authTool.func({})).rejects.toThrow('Cannot read properties of undefined')
       }
     })
 
     it('should throw error when response has no headers property (bug in implementation)', async () => {
       const authTool = getLiveToolsDefinitions[LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP1]
-      
+
       mockQCClientInstance.postWithRawResponse.mockResolvedValue({})
 
       if ('func' in authTool) {
-        await expect(authTool.func({})).rejects.toThrow("Cannot read properties of undefined")
+        await expect(authTool.func({})).rejects.toThrow('Cannot read properties of undefined')
       }
     })
   })
 
   describe('tool consistency', () => {
     it('should have consistent title formatting', () => {
-      Object.values(getLiveToolsDefinitions).forEach(tool => {
+      Object.values(getLiveToolsDefinitions).forEach((tool) => {
         expect(tool.config.title).toBeDefined()
         expect(typeof tool.config.title).toBe('string')
-        
+
         if (tool.config.title) {
           expect(tool.config.title.length).toBeGreaterThan(0)
-          
+
           // Should not end with period
           expect(tool.config.title).not.toMatch(/\.$/)
-          
+
           // Should be properly capitalized
           expect(tool.config.title.charAt(0)).toMatch(/[A-Z]/)
         }
@@ -740,11 +751,11 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
     })
 
     it('should have consistent description formatting', () => {
-      Object.values(getLiveToolsDefinitions).forEach(tool => {
+      Object.values(getLiveToolsDefinitions).forEach((tool) => {
         if (tool.config.description) {
           expect(typeof tool.config.description).toBe('string')
           expect(tool.config.description.length).toBeGreaterThan(0)
-          
+
           // Authorization tools have multiline descriptions without ending period
           if (tool.config.title?.includes('Authorize external connection')) {
             expect(tool.config.description).not.toMatch(/\.$/)
@@ -753,7 +764,7 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
             // Other tools should end with period
             expect(tool.config.description).toMatch(/\.$/)
           }
-          
+
           // Should be properly capitalized
           expect(tool.config.description.charAt(0)).toMatch(/[A-Z]/)
         }
@@ -761,7 +772,7 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
     })
 
     it('should have consistent annotation patterns', () => {
-      Object.values(getLiveToolsDefinitions).forEach(tool => {
+      Object.values(getLiveToolsDefinitions).forEach((tool) => {
         if (tool.config.annotations) {
           // All annotation values should be boolean when present
           if (tool.config.annotations.readOnlyHint !== undefined) {
@@ -784,35 +795,28 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
         LIVE_TOOL_KEYS.READ_LIVE_LOGS,
         LIVE_TOOL_KEYS.READ_LIVE_PORTFOLIO,
         LIVE_TOOL_KEYS.READ_LIVE_ORDERS,
-        LIVE_TOOL_KEYS.READ_LIVE_INSIGHTS
+        LIVE_TOOL_KEYS.READ_LIVE_INSIGHTS,
       ]
 
-      realTimeTools.forEach(toolKey => {
+      realTimeTools.forEach((toolKey) => {
         const tool = getLiveToolsDefinitions[toolKey]
         expect(tool.config.description).toMatch(/\d+ minutes/)
       })
     })
 
     it('should have tools for algorithm lifecycle management', () => {
-      const lifecycleTools = [
-        LIVE_TOOL_KEYS.CREATE_LIVE_ALGORITHM,
-        LIVE_TOOL_KEYS.STOP_LIVE_ALGORITHM,
-        LIVE_TOOL_KEYS.LIQUIDATE_LIVE_ALGORITHM
-      ]
+      const lifecycleTools = [LIVE_TOOL_KEYS.CREATE_LIVE_ALGORITHM, LIVE_TOOL_KEYS.STOP_LIVE_ALGORITHM, LIVE_TOOL_KEYS.LIQUIDATE_LIVE_ALGORITHM]
 
-      lifecycleTools.forEach(toolKey => {
+      lifecycleTools.forEach((toolKey) => {
         const tool = getLiveToolsDefinitions[toolKey]
         expect(tool.config.title).toMatch(/live algorithm/)
       })
     })
 
     it('should have tools for external authorization', () => {
-      const authTools = [
-        LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP1,
-        LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP2
-      ]
+      const authTools = [LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP1, LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP2]
 
-      authTools.forEach(toolKey => {
+      authTools.forEach((toolKey) => {
         const tool = getLiveToolsDefinitions[toolKey]
         expect(tool.config.title).toContain('Authorize external connection')
         expect(tool.config.description).toContain('external connection with a live brokerage')
@@ -820,12 +824,9 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
     })
 
     it('should have proper risk management tools', () => {
-      const riskTools = [
-        LIVE_TOOL_KEYS.STOP_LIVE_ALGORITHM,
-        LIVE_TOOL_KEYS.LIQUIDATE_LIVE_ALGORITHM
-      ]
+      const riskTools = [LIVE_TOOL_KEYS.STOP_LIVE_ALGORITHM, LIVE_TOOL_KEYS.LIQUIDATE_LIVE_ALGORITHM]
 
-      riskTools.forEach(toolKey => {
+      riskTools.forEach((toolKey) => {
         const tool = getLiveToolsDefinitions[toolKey]
         expect(tool.config.annotations?.destructiveHint).toBe(true)
         expect(tool.config.annotations?.idempotentHint).toBe(true)
@@ -836,25 +837,21 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
   describe('custom function implementation', () => {
     it('should use postWithRawResponse for header access', async () => {
       const authTool = getLiveToolsDefinitions[LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP1]
-      
+
       if ('func' in authTool) {
         await authTool.func({})
-        
-        expect(mockQCClientInstance.postWithRawResponse).toHaveBeenCalledWith(
-          '/live/auth0/authorize',
-          { redirect: false },
-          { timeout: 300000 }
-        )
+
+        expect(mockQCClientInstance.postWithRawResponse).toHaveBeenCalledWith('/live/auth0/authorize', { redirect: false }, { timeout: 300000 })
       }
     })
 
     it('should extract redirect URL from response headers', async () => {
       const authTool = getLiveToolsDefinitions[LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP1]
-      
+
       if ('func' in authTool) {
         const testUrl = 'https://test-auth.example.com/callback'
         mockQCClientInstance.postWithRawResponse.mockResolvedValue({
-          headers: { 'Location': testUrl }
+          headers: { Location: testUrl },
         })
 
         const result = await authTool.func({})
@@ -864,21 +861,21 @@ describe('libs/quant-connect-mcp/src/tools/live-tools', () => {
 
     it('should handle both Location header cases', async () => {
       const authTool = getLiveToolsDefinitions[LIVE_TOOL_KEYS.AUTHORIZE_CONNECTION_STEP1]
-      
+
       if ('func' in authTool) {
         // Test uppercase Location
         mockQCClientInstance.postWithRawResponse.mockResolvedValue({
-          headers: { 'Location': 'https://upper.example.com' }
+          headers: { Location: 'https://upper.example.com' },
         })
-        
+
         let result = await authTool.func({})
         expect(result.authURL).toBe('https://upper.example.com')
 
         // Test lowercase location
         mockQCClientInstance.postWithRawResponse.mockResolvedValue({
-          headers: { 'location': 'https://lower.example.com' }
+          headers: { location: 'https://lower.example.com' },
         })
-        
+
         result = await authTool.func({})
         expect(result.authURL).toBe('https://lower.example.com')
       }
