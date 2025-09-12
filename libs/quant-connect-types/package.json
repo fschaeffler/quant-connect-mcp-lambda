@@ -1,0 +1,16 @@
+{
+  "name": "@fschaeffler/quant-connect-types",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "npx orval --config orval.config.ts"
+  },
+  "devDependencies": {
+    "orval": "7.11.2",
+    "typescript": "5.9.2"
+  },
+  "dependencies": {
+    "zod": "3.25.76"
+  }
+}

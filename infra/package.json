@@ -1,0 +1,17 @@
+{
+  "name": "@fschaeffler/quant-connect-mcp-infra",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "deploy": "npx cdk deploy --all --require-approval never"
+  },
+  "devDependencies": {
+    "aws-cdk": "2.1029.0",
+    "typescript": "5.9.2"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.214.0",
+    "constructs": "10.4.2",
+    "source-map-support": "0.5.21"
+  }
+}
