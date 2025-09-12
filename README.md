@@ -2,6 +2,10 @@
 
 Model Context Protocol server for AI assistants to interact with QuantConnect's algorithmic trading platform.
 
+<div align="center">
+   <img src="docs/images/quantconnect-mcp-lambda.jpg" width="75%">
+</div>
+
 ## Overview
 
 Bridge between AI assistants and QuantConnect platform for:
