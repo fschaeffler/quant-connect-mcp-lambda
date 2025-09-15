@@ -27,8 +27,8 @@ npm ci
 npm run build
 
 # Set up environment
-echo "QC_USER_ID=your-user-id" > .env
-echo "QC_API_TOKEN=your-api-token" >> .env
+echo "QUANTCONNECT_USER_ID=your-user-id" > .env
+echo "QUANTCONNECT_API_TOKEN=your-api-token" >> .env
 
 # Start local server
 cd services/quant-connect-local
@@ -195,8 +195,8 @@ nodemon --watch libs/quant-connect-mcp/dist \
 
 ```bash
 # QuantConnect API
-QC_USER_ID=your-quantconnect-user-id
-QC_API_TOKEN=your-quantconnect-api-token
+QUANTCONNECT_USER_ID=your-quantconnect-user-id
+QUANTCONNECT_API_TOKEN=your-quantconnect-api-token
 
 # Server Configuration
 NODE_ENV=development
@@ -224,8 +224,8 @@ MAX_CONCURRENT_REQUESTS=10
 import { z } from 'zod'
 
 const configSchema = z.object({
-  QC_USER_ID: z.string().min(1),
-  QC_API_TOKEN: z.string().min(1),
+  QUANTCONNECT_USER_ID: z.string().min(1),
+  QUANTCONNECT_API_TOKEN: z.string().min(1),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.string().regex(/^\d+$/).transform(Number).default('55555'),
   HOST: z.string().default('0.0.0.0'),
@@ -635,8 +635,8 @@ export async function waitForCompilation(
 
 ```bash
 # .env.debug
-QC_USER_ID=test-user-id
-QC_API_TOKEN=test-api-token
+QUANTCONNECT_USER_ID=test-user-id
+QUANTCONNECT_API_TOKEN=test-api-token
 NODE_ENV=development
 DEBUG=quant-connect:*,mcp:*
 LOG_LEVEL=debug
@@ -1074,11 +1074,11 @@ npx orval --config orval.config.ts
 ```bash
 # Test credentials directly
 curl -X GET "https://www.quantconnect.com/api/v2/account/read" \
-  -H "Authorization: Basic $(echo -n $QC_USER_ID:$QC_API_TOKEN | base64)"
+  -H "Authorization: Basic $(echo -n $QUANTCONNECT_USER_ID:$QUANTCONNECT_API_TOKEN | base64)"
 
 # Check environment variables
-echo "User ID: $QC_USER_ID"
-echo "Token length: ${#QC_API_TOKEN}"
+echo "User ID: $QUANTCONNECT_USER_ID"
+echo "Token length: ${#QUANTCONNECT_API_TOKEN}"
 ```
 
 #### MCP Client connection issues

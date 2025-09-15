@@ -68,8 +68,8 @@ Create a `.env` file in the project root:
 
 ```bash
 # QuantConnect API Credentials
-QC_USER_ID=your-quantconnect-user-id
-QC_API_TOKEN=your-quantconnect-api-token
+QUANTCONNECT_USER_ID=your-quantconnect-user-id
+QUANTCONNECT_API_TOKEN=your-quantconnect-api-token
 
 # Development Settings
 NODE_ENV=development
