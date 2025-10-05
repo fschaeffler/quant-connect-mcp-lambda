@@ -102,6 +102,13 @@ export const middyMCP = ({ server }: MCPMiddlewareOptions): middy.MiddlewareObj<
               : JSON.stringify(responseMessages),
         }
       }
+
+      if (!request.response.body || request.response.body?.length === 0) {
+        throw createMcpError(202, {
+          code: -32601,
+          message: 'Unsupported request.',
+        })
+      }
     },
   }
 }

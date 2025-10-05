@@ -233,32 +233,22 @@ describe('libs/middy/src/mcp/mcp', () => {
   })
 
   describe('after hook - response handling', () => {
-    it('should handle null response by setting default', async () => {
+    it('should throw error for null response resulting in empty body', async () => {
       const request = createMockRequest()
       request.context.jsonRPCMessages = [{ jsonrpc: '2.0' as const, id: 1, method: 'test' }]
       request.response = null
 
-      await middleware.after!(request)
-
-      expect(request.response).toEqual({
-        headers: { 'Content-Type': 'text/plain' },
-        statusCode: 202,
-        body: '',
-      })
+      await expect(middleware.after!(request)).rejects.toThrow()
+      expect(mockedCreateHttpError).toHaveBeenCalledWith(202, expect.stringContaining('Unsupported request'))
     })
 
-    it('should handle string response by setting default', async () => {
+    it('should throw error for string response resulting in empty body', async () => {
       const request = createMockRequest()
       request.context.jsonRPCMessages = [{ jsonrpc: '2.0' as const, id: 1, method: 'test' }]
       request.response = 'some string' as any
 
-      await middleware.after!(request)
-
-      expect(request.response).toEqual({
-        headers: { 'Content-Type': 'text/plain' },
-        statusCode: 202,
-        body: '',
-      })
+      await expect(middleware.after!(request)).rejects.toThrow()
+      expect(mockedCreateHttpError).toHaveBeenCalledWith(202, expect.stringContaining('Unsupported request'))
     })
 
     it('should process messages and update response', async () => {

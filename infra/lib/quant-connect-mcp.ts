@@ -72,7 +72,9 @@ export class QuantConnectMCPStack extends Stack {
       principal: new ServicePrincipal('apigateway.amazonaws.com'),
     })
 
-    this.mcpResource.addMethod(HttpMethod.POST, new LambdaIntegration(this.handler), { apiKeyRequired: true })
+    this.mcpResource.addMethod(HttpMethod.POST, new LambdaIntegration(this.handler), {
+      apiKeyRequired: true,
+    })
 
     this.mcpResource.addMethod(
       HttpMethod.GET,
