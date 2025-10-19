@@ -5,6 +5,7 @@ import type { Context } from 'aws-lambda'
 import createHttpError from 'http-errors'
 import { z } from 'zod'
 import type { RequestEvent, ResponseEvent } from '../types'
+import { SecureLogger } from '../utils/secure-logger'
 import { HttpServerTransport } from './http-server-transport'
 
 const createMcpError = (httpStatusCode: number, mcpError: { code: number; message: string }) => {
@@ -36,8 +37,12 @@ export const middyMCP = ({ server }: MCPMiddlewareOptions): middy.MiddlewareObj<
 
   return {
     before: async ({ event: { headers, body, isBase64Encoded }, context }) => {
-      // eslint-disable-next-line no-console
-      console.log('MCP request received', { headers, body, isBase64Encoded })
+      SecureLogger.info('MCP request received', { 
+        headers, 
+        body, 
+        isBase64Encoded,
+        timestamp: new Date().toISOString()
+      })
 
       const contentTypeHeaderValue = headers?.['content-type'] ?? headers?.['Content-Type']
       const acceptHeaderValue = headers?.['accept'] ?? headers?.['Accept']

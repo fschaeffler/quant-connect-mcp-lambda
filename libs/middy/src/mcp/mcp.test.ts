@@ -350,11 +350,14 @@ describe('libs/middy/src/mcp/mcp', () => {
 
       await middleware.before!(request)
 
-      expect(consoleSpy).toHaveBeenCalledWith('MCP request received', {
-        headers: request.event.headers,
-        body: request.event.body,
-        isBase64Encoded: request.event.isBase64Encoded,
-      })
+      expect(consoleSpy).toHaveBeenCalledWith('MCP request received', 
+        expect.objectContaining({
+          headers: request.event.headers,
+          body: request.event.body,
+          isBase64Encoded: request.event.isBase64Encoded,
+          timestamp: expect.any(String),
+        })
+      )
     })
   })
 
