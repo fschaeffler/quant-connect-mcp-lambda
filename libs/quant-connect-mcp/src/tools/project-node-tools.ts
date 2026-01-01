@@ -1,4 +1,4 @@
-import { readProjectNodeBody, updateProjectNodeBody, updateProjectNodeResponse } from '@fschaeffler/quant-connect-types'
+import { readProjectNodeBody, readProjectNodeResponse, updateProjectNodeBody, updateProjectNodeResponse } from '@fschaeffler/quant-connect-types'
 import type { ToolRegistrationDefinitions } from './index'
 import { PROJECT_NODE_TOOL_KEYS } from './tool-keys'
 
@@ -8,7 +8,7 @@ export const getProjectNodeToolsDefinitions: ToolRegistrationDefinitions<PROJECT
       title: 'Read project nodes',
       description: 'Read the available and selected nodes of a project.',
       inputSchema: readProjectNodeBody.shape,
-      outputSchema: readProjectNodeBody.shape,
+      outputSchema: readProjectNodeResponse.shape,
       annotations: {
         readOnlyHint: true,
       },
