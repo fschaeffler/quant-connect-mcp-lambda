@@ -6417,10 +6417,14 @@ components:
               items:
                 type: array
                 items:
-                  type: object
+                  oneOf:
+                    - type: number
+                      nullable: true
+                    - type: string
             - type: array
               items:
                 type: object
+                additionalProperties: true
           description:
             Values for the series plot. These values are assumed to be
             in ascending time order (first points earliest, last points latest)

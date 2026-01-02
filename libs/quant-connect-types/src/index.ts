@@ -2987,7 +2987,7 @@ export const readBacktestChartResponse = zod.union([
                   unit: zod.string().optional().nullable().describe('Axis for the chart series.'),
                   index: zod.coerce.number().optional().nullable().describe('Index/position of the series on the chart.'),
                   values: zod
-                    .union([zod.array(zod.array(zod.object({}))), zod.array(zod.object({}))])
+                    .union([zod.array(zod.array(zod.union([zod.coerce.number().nullable(), zod.string()]))), zod.array(zod.record(zod.string(), zod.any()))])
                     .optional()
                     .nullable()
                     .describe('Values for the series plot. These values are assumed to be in ascending time order (first points earliest, last points latest)'),
@@ -3194,7 +3194,7 @@ export const readLiveChartResponse = zod.union([
                   unit: zod.string().optional().nullable().describe('Axis for the chart series.'),
                   index: zod.coerce.number().optional().nullable().describe('Index/position of the series on the chart.'),
                   values: zod
-                    .union([zod.array(zod.array(zod.object({}))), zod.array(zod.object({}))])
+                    .union([zod.array(zod.array(zod.union([zod.coerce.number().nullable(), zod.string()]))), zod.array(zod.record(zod.string(), zod.any()))])
                     .optional()
                     .nullable()
                     .describe('Values for the series plot. These values are assumed to be in ascending time order (first points earliest, last points latest)'),
