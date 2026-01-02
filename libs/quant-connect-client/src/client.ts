@@ -28,6 +28,8 @@ export class QCClient {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache',
       },
+      // Timeout before API Gateway's hard 29s limit to allow graceful error responses
+      timeout: 25000,
     })
 
     if (this.requestThrottleInMS) {
