@@ -1,4 +1,4 @@
-import { Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib'
+import { Duration, RemovalPolicy, Size, Stack, StackProps } from 'aws-cdk-lib'
 import { LambdaIntegration, MockIntegration, PassthroughBehavior, Resource, RestApi, UsagePlan } from 'aws-cdk-lib/aws-apigateway'
 import { ApiKey, HttpMethod } from 'aws-cdk-lib/aws-apigatewayv2'
 import { ServicePrincipal } from 'aws-cdk-lib/aws-iam'
@@ -25,6 +25,8 @@ export class QuantConnectMCPStack extends Stack {
       deployOptions: {
         stageName: 'prod',
       },
+      // Enable gzip compression for responses > 1KB when client sends Accept-Encoding header
+      minCompressionSize: Size.bytes(1024),
     })
 
     this.restAPIUsagePlan = this.restAPI.addUsagePlan('qc-mcp-usage-plan', {

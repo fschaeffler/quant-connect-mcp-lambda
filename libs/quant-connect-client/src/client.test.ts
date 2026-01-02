@@ -70,6 +70,7 @@ describe('libs/quant-connect-client/src/client', () => {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-cache',
         },
+        timeout: 25000,
       })
     })
 
@@ -118,6 +119,7 @@ describe('libs/quant-connect-client/src/client', () => {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-cache',
         },
+        timeout: 25000,
       })
     })
 
